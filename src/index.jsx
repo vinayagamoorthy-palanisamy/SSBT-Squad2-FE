@@ -13,10 +13,10 @@ if (container) {
   const root = ReactDOM.createRoot(container);
   root.render(
     <React.StrictMode>
-      {/* <App /> */}
-      <ExtractCenterTable />
+      <App />
+      {/* <ExtractCenterTable />
       <SubmitCoreExtract />
-      <SubmitCustomExtract />
+      <SubmitCustomExtract /> */}
     </React.StrictMode>
   );
 } else {
