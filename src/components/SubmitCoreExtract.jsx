@@ -11,7 +11,7 @@ const SubmitCoreExtract = () => {
   const handleSubmit = () => console.log('Submit clicked');
   return (
     <div style={{ padding: 24, background: '#fff', height: "500px" }}>
-      <DynamicExtractForm title="Submit Core Extract" fields={coreExtractFields} />
+      <DynamicExtractForm title="Submit Core Extract" fields={coreExtractFields} isTitleAvailable />
       <DynamicButtonGroup
         showBack
         showCancel

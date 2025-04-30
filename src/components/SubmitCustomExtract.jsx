@@ -11,7 +11,7 @@ const SubmitCustomExtract = () => {
   const handleSubmit = () => console.log('Submit clicked');
   return (
     <div style={{ padding: 24, background: '#fff', height: "500px" }}>
-      <DynamicExtractForm title="Submit Custom Extract" fields={customExtractFields} />
+      <DynamicExtractForm title="Submit Custom Extract" fields={customExtractFields} isTitleAvailable/>
       <DynamicButtonGroup
         showBack
         showCancel

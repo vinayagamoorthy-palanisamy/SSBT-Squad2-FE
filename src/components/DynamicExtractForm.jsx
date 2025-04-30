@@ -1,10 +1,10 @@
 import React from 'react';
-import { Box, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, MenuItem, Stack, TextField, Typography } from '@mui/material';
 
-const DynamicExtractForm = ({ title, fields }) => {
+const DynamicExtractForm = ({ title, fields, isTitleAvailable=false, color, customTitleStyle={mb: 3} }) => {
   return (
     <Box>
-      <Typography variant="h6" sx={{ mb: 3 }}>{title}</Typography>
+      {isTitleAvailable && <Typography variant="h6" sx={customTitleStyle} color={color}>{title}</Typography>}
       <Box
         sx={{
           display: 'flex',
@@ -15,7 +15,7 @@ const DynamicExtractForm = ({ title, fields }) => {
       >
         {fields.map((field, idx) => (
           <Box key={idx} sx={{ flex: '1 1 calc(25% - 16px)', minWidth: 200 }}>
-            {field.type === 'select' ? (
+            {field?.type === 'select' ? (
               <TextField
                 fullWidth
                 select
@@ -28,13 +28,18 @@ const DynamicExtractForm = ({ title, fields }) => {
                   </MenuItem>
                 ))}
               </TextField>
-            ) : (
+            ) : field?.type === 'text' ? (
               <TextField
                 fullWidth
-                label={field.label}
-                placeholder={field.placeholder}
-                defaultValue={field.defaultValue || ''}
+                label={field?.label}
+                placeholder={field?.placeholder}
+                defaultValue={field?.defaultValue || ''}
               />
+            ) : (
+              <Stack spacing={1}>
+              <Typography variant='body2' color='black'>{field?.label}</Typography>
+              <Typography variant='body2' color='black'>{field?.defaultValue}</Typography>
+              </Stack>
             )}
           </Box>
         ))}
