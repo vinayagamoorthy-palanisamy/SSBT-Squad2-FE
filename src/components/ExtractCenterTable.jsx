@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import DropDown from "./DropDown";
 import SearchableDropdown from "./SearchableDropdown";
+import useExtractCenterDataStore from "../store/useExtractCenterTable";
+import { ScaleLoader } from "react-spinners";
 
 const theme = createTheme({
   palette: {
@@ -53,75 +55,14 @@ const theme = createTheme({
 });
 
 const ExtractCenterTable = () => {
-  const [data] = useState([
-    {
-      extractName: "Extract1",
-      version: 8,
-      status: "Submitted",
-      type: "Core",
-      parameter: "-",
-      identifier: "-",
-      format: "Formatted",
-    },
-    {
-      extractName: "Extract2",
-      version: 1,
-      status: "Draft",
-      type: "Custom",
-      parameter: "Client Name",
-      identifier: "ANIL",
-      format: "Delimited",
-    },
-    {
-      extractName: "Extract2",
-      version: 1,
-      status: "Draft",
-      type: "Custom",
-      parameter: "Client Name",
-      identifier: "ANIL",
-      format: "Delimited",
-    },
-    {
-      extractName: "Extract2",
-      version: 1,
-      status: "Draft",
-      type: "Custom",
-      parameter: "Client Name",
-      identifier: "ANIL",
-      format: "Delimited",
-    },
-    {
-      extractName: "Extract2",
-      version: 1,
-      status: "Draft",
-      type: "Custom",
-      parameter: "Client Name",
-      identifier: "ANIL",
-      format: "Delimited",
-    },
-    {
-      extractName: "Extract2",
-      version: 1,
-      status: "Draft",
-      type: "Custom",
-      parameter: "Client Name",
-      identifier: "ANIL",
-      format: "Delimited",
-    },
-    {
-      extractName: "Extract2",
-      version: 1,
-      status: "Draft",
-      type: "Custom",
-      parameter: "Client Name",
-      identifier: "ANIL",
-      format: "Delimited",
-    },
-  ]);
+  const { extractCenterData, error, loading, fetchExtractCenterData } = useExtractCenterDataStore((state) => state);
+  
   const [tab,setTab] = useState("extract")
   const [client, setClient] = React.useState("");
-  const [dataService, setDataService] = React.useState("");
-  const [selectedRows,setChecked] = useState()
+
+  useEffect(() => {
+    fetchExtractCenterData();
+  }, []);
 
   const options = [
     'Hdfc',
@@ -137,22 +78,20 @@ const ExtractCenterTable = () => {
   const handleChangeClient = (event) => {
     setClient(event.target.value);
   };
-  const handleChangeDataService = (event) => {
-    setDataService(event.target.value);
-  };
+  // const handleChangeDataService = (event) => {
+  //   setDataService(event.target.value);
+  // };
   function handleTabs(tab){
     setTab(()=>tab)
   }
-  let selectedRowsItems = []
-  function handleCheckboxChange(data){
-    selectedRowsItems.push(data)
+  // let selectedRowsItems = []
+  // function handleCheckboxChange(data){
+  //   selectedRowsItems.push(data)
+  //   const updatedData = new Set([...selectedRowsItems])
 
-    const updatedData = new Set([...selectedRowsItems])
- 
-    console.log("updatedData",updatedData)
+  //   console.log("updatedData",updatedData)
 
-
-  }
+  // }
 
 
   const columns = useMemo(
@@ -162,8 +101,8 @@ const ExtractCenterTable = () => {
         header: "Select",
         Cell: ({ row }) => (
           <Checkbox
-            checked={selectedRows}
-            onChange={() => handleCheckboxChange(row)}
+            // checked={selectedRows}
+            // onChange={() => handleCheckboxChange(row)}
           />
         ),
         enableColumnFilter: false,
@@ -216,18 +155,23 @@ const ExtractCenterTable = () => {
   );
   const table = useMaterialReactTable({
     columns,
-    data,
+    data:extractCenterData,
     enableGlobalFilter: false,
     enableTopToolbar: false,
     enableFullScreenToggle: false,
-    enablePagination: false,
+    enablePagination:true,
+    paginationDisplayMode:"pages",
     initialState: {
       showColumnFilters: true,
+      pagination:{
+        pageSize:5,
+        pageIndex:0,
+      }
     },
   });
 
-  console.log("selectedRowsItems",selectedRowsItems)
-  return (
+
+  return  (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{
@@ -245,7 +189,7 @@ const ExtractCenterTable = () => {
       >
         <Box sx={{ display: "flex", justifyContent: "end",paddingBottom:"20px", gap:"18px" }}>
           <SearchableDropdown label="Client name" options={options}/>
-          <SearchableDropdown label="Data Service" options={options}/>
+          <SearchableDropdown label="Data ervice" options={options}/>
 
         </Box>
 
@@ -295,8 +239,9 @@ const ExtractCenterTable = () => {
 
             }
           </Box>
-          <Box>
-            <MaterialReactTable table={table} />
+          <Box display="flex" alignItems="center"  justifyContent="center">
+            {loading ? <ScaleLoader /> :
+            <MaterialReactTable table={table} />}
           </Box>
         </Box>
       </Box>
