@@ -3,9 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import ExtractCenterTable from './components/ExtractCenterTable';
-import SubmitCoreExtract from './components/SubmitCoreExtract';
-import SubmitCustomExtract from './components/SubmitCustomExtract';
 
 const container = document.getElementById('root');
 
