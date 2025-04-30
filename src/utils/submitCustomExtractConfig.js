@@ -63,3 +63,17 @@ export const customExtractFields = [
     { name: "P_IN_EFFECTIVE_DATE_VALUE", value: "1345672354" },
     { name: "P_IN_ENTITY_ID_VALUE", value: "3489723458" },
   ];
+
+  export const submitExtractButtons = [
+    {seq: 1, label: 'Back', variant:'outlined', onClick: () => console.log('Back clicked')},
+    {seq: 2, label: 'Cancel', variant:'outlined', onClick: () => console.log('Cancel clicked')},
+    {seq: 3, label: 'Save', color:'primary', onClick: () => console.log('Save clicked')},
+    {seq: 4, label: 'Submit', color:'primary', onClick: () => console.log('Submit clicked')}
+  ];
+
+  export const viewExtractButtons = [
+    {seq: 5, label: 'Edit', color:'dark', onClick: () => console.log('Edit clicked')},
+    {seq: 6, label: 'Clone Extract', color:'dark', onClick: () => console.log('Clone Extract clicked')},
+    {seq: 7, label: 'Approve', color:'dark', onClick: () => console.log('Approve clicked')},
+    {seq: 8, label: 'Reject', color:'dark', onClick: () => console.log('Reject clicked')}
+  ];
