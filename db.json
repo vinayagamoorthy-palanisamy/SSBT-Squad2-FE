@@ -1,0 +1,88 @@
+{
+ "extractCenterData":{
+ "tableData":[
+    {
+      "extractName": "Extract1",
+      "version": 8,
+      "status": "Submitted",
+      "type": "Core",
+      "parameter": "-",
+      "identifier": "-",
+      "format": "Formatted"
+    },
+    {
+      "extractName": "Extract2",
+      "version": 1,
+      "status": "Draft",
+      "type": "Custom",
+      "parameter": "Client Name",
+      "identifier": "ANIL",
+      "format": "Delimited"
+    },
+    {
+      "extractName": "Extract2",
+      "version": 1,
+      "status": "Draft",
+      "type": "Custom",
+      "parameter": "Client Name",
+      "identifier": "ANIL",
+      "format": "Delimited"
+    },
+    {
+      "extractName": "Extract2",
+      "version": 1,
+      "status": "Draft",
+      "type": "Custom",
+      "parameter": "Client Name",
+      "identifier": "ANIL",
+      "format": "Delimited"
+    },
+    {
+      "extractName": "Extract2",
+      "version": 1,
+      "status": "Draft",
+      "type": "Custom",
+      "parameter": "Client Name",
+      "identifier": "ANIL",
+      "format": "Delimited"
+    },
+    {
+      "extractName": "Extract2",
+      "version": 1,
+      "status": "Draft",
+      "type": "Custom",
+      "parameter": "Client Name",
+      "identifier": "ANIL",
+      "format": "Delimited"
+    },
+    {
+      "extractName": "Extract3",
+      "version": 1,
+      "status": "Draft",
+      "type": "Custom",
+      "parameter": "Client Name",
+      "identifier": "ANIL",
+      "format": "Delimited"
+    }
+  ],
+  "clientAndDataService":[
+    {
+      "client":"Hdfc bank",
+      "dataService":["hdfc 1","hdfc 2","hdfc 3","hdfc 4"]
+    },
+    {
+      "client":"Axis bank",
+      "dataService":["axis 1","axis 2","axis 3","axis 4"]
+    },
+    {
+      "client":"Icici bank",
+      "dataService":["icici 1","icici 2","icici 3","icici 4"]
+    }
+  ],
+  "timeZone":[
+    "india",
+    "Boston",
+    "sir lanka"
+  ]
+ }
+}
