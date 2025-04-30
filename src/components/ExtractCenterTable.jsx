@@ -56,7 +56,6 @@ const theme = createTheme({
 
 const ExtractCenterTable = () => {
   const { extractCenterData, error, loading, fetchExtractCenterData } = useExtractCenterDataStore((state) => state);
-  
   const [tab,setTab] = useState("extract")
   const [client, setClient] = React.useState("");
 
@@ -78,21 +77,10 @@ const ExtractCenterTable = () => {
   const handleChangeClient = (event) => {
     setClient(event.target.value);
   };
-  // const handleChangeDataService = (event) => {
-  //   setDataService(event.target.value);
-  // };
+
   function handleTabs(tab){
     setTab(()=>tab)
   }
-  // let selectedRowsItems = []
-  // function handleCheckboxChange(data){
-  //   selectedRowsItems.push(data)
-  //   const updatedData = new Set([...selectedRowsItems])
-
-  //   console.log("updatedData",updatedData)
-
-  // }
-
 
   const columns = useMemo(
     () => [
@@ -155,7 +143,7 @@ const ExtractCenterTable = () => {
   );
   const table = useMaterialReactTable({
     columns,
-    data:extractCenterData,
+    data:extractCenterData?.tableData ?? [],
     enableGlobalFilter: false,
     enableTopToolbar: false,
     enableFullScreenToggle: false,
@@ -169,7 +157,6 @@ const ExtractCenterTable = () => {
       }
     },
   });
-
 
   return  (
     <ThemeProvider theme={theme}>
@@ -233,6 +220,7 @@ const ExtractCenterTable = () => {
               <DropDown
                 value={client}
                 handleChange={handleChangeClient}
+                options={extractCenterData?.timeZone}
                 label={"Time Zone"}
               />
             </Box>

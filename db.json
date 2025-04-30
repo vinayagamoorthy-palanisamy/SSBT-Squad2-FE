@@ -1,5 +1,6 @@
 {
- "extractCenterData": [
+ "extractCenterData":{
+ "tableData":[
     {
       "extractName": "Extract1",
       "version": 8,
@@ -63,5 +64,25 @@
       "identifier": "ANIL",
       "format": "Delimited"
     }
+  ],
+  "clientAndDataService":[
+    {
+      "client":"Hdfc bank",
+      "dataService":["hdfc 1","hdfc 2","hdfc 3","hdfc 4"]
+    },
+    {
+      "client":"Axis bank",
+      "dataService":["axis 1","axis 2","axis 3","axis 4"]
+    },
+    {
+      "client":"Icici bank",
+      "dataService":["icici 1","icici 2","icici 3","icici 4"]
+    }
+  ],
+  "timeZone":[
+    "india",
+    "Boston",
+    "sir lanka"
   ]
+ }
 }
