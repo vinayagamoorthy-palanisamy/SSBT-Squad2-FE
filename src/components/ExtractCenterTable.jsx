@@ -1,20 +1,20 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "material-react-table";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Button,
   createTheme,
   ThemeProvider,
   CssBaseline,
-  Checkbox,
+  Tabs,
+  Tab,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
+import { MaterialReactTable } from "material-react-table";
+import { useExtractCenterTable } from "../hooks/useExtractCenterTable"; // ⬅️ custom hook
+import useExtractCenterDataStore from "../store/useExtractCenterTable";
 import DropDown from "./DropDown";
 import SearchableDropdown from "./SearchableDropdown";
-import useExtractCenterDataStore from "../store/useExtractCenterTable";
-import { ScaleLoader } from "react-spinners";
 
 const theme = createTheme({
   palette: {
@@ -54,119 +54,40 @@ const theme = createTheme({
   },
 });
 
+const clientOptions = ['Hdfc', 'Hsbc', 'Axis', 'Sbi', 'Canara', 'ICICI', 'Punjab Bank'];
+
 const ExtractCenterTable = () => {
-  const { extractCenterData, error, loading, fetchExtractCenterData } = useExtractCenterDataStore((state) => state);
-  const [tab,setTab] = useState("extract")
-  const [client, setClient] = React.useState("");
+  const { extractCenterData, loading, error, fetchExtractCenterData } =
+    useExtractCenterDataStore((state) => state);
+
+  const [tab, setTab] = useState("extract");
+  const [client, setClient] = useState("");
+
+  const { table, selectedRows } = useExtractCenterTable(
+    extractCenterData?.tableData ?? []
+  );
 
   useEffect(() => {
     fetchExtractCenterData();
+  }, [fetchExtractCenterData]);
+
+  const handleTabChange = useCallback((_, newTab) => {
+    setTab(newTab);
   }, []);
-
-  const options = [
-    'Hdfc',
-    'Hsbc',
-    'Axis',
-    'Sbi',
-    'Canara',
-    'ICICI',
-    'Punjab Bank',
-  ];
-
 
   const handleChangeClient = (event) => {
     setClient(event.target.value);
   };
 
-  function handleTabs(tab){
-    setTab(()=>tab)
-  }
+  const hasSelected = Object.values(selectedRows).some(Boolean);
 
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: "select",
-        header: "Select",
-        Cell: ({ row }) => (
-          <Checkbox
-            // checked={selectedRows}
-            // onChange={() => handleCheckboxChange(row)}
-          />
-        ),
-        enableColumnFilter: false,
-        size: 60,
-      },
-      {
-        accessorKey: "extractName",
-        header: "Extract Name",
-        size: 160,
-        enableColumnFilter: true,
-      },
-      {
-        accessorKey: "version",
-        header: "Version",
-        size: 80,
-        enableColumnFilter: true,
-      },
-      {
-        accessorKey: "status",
-        header: "Status",
-        size: 120,
-        enableColumnFilter: true,
-      },
-      {
-        accessorKey: "type",
-        header: "Extract Type",
-        size: 120,
-        enableColumnFilter: true,
-      },
-      {
-        accessorKey: "parameter",
-        header: "Extract Parameter",
-        size: 180,
-        enableColumnFilter: true,
-      },
-      {
-        accessorKey: "identifier",
-        header: "Extract Identifier",
-        size: 160,
-        enableColumnFilter: true,
-      },
-      {
-        accessorKey: "format",
-        header: "Extract Format",
-        size: 140,
-        enableColumnFilter: true,
-      },
-    ],
-    []
-  );
-  const table = useMaterialReactTable({
-    columns,
-    data:extractCenterData?.tableData ?? [],
-    enableGlobalFilter: false,
-    enableTopToolbar: false,
-    enableFullScreenToggle: false,
-    enablePagination:true,
-    paginationDisplayMode:"pages",
-    initialState: {
-      showColumnFilters: true,
-      pagination:{
-        pageSize:5,
-        pageIndex:0,
-      }
-    },
-  });
-
-  return  (
+  return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{
-        background:"white",
-        padding:"3px 6px"
-      }} >
-        <p>State street / core data</p>
+      <Box sx={{ background: "white", padding: "3px 6px" }}>
+        <p>State Street / Core Data</p>
       </Box>
+
       <Box
         p={3}
         sx={{
@@ -174,62 +95,70 @@ const ExtractCenterTable = () => {
           minHeight: "100vh",
         }}
       >
-        <Box sx={{ display: "flex", justifyContent: "end",paddingBottom:"20px", gap:"18px" }}>
-          <SearchableDropdown label="Client name" options={options}/>
-          <SearchableDropdown label="Data ervice" options={options}/>
-
-        </Box>
-
+        {/* Dropdown filters */}
         <Box
           sx={{
-            background: "white",
-            padding:"1rem"
+            display: "flex",
+            justifyContent: "end",
+            paddingBottom: "20px",
+            gap: "18px",
+            flexWrap: "wrap",
           }}
         >
+          <SearchableDropdown label="Client Name" options={clientOptions} />
+          <SearchableDropdown label="Data Service" options={clientOptions} />
+        </Box>
+
+        {/* Main table section */}
+        <Box sx={{ background: "white", padding: "1rem" }}>
+          {/* Tabs */}
+          <Tabs value={tab} onChange={handleTabChange}>
+            <Tab value="extract" label="Extract Center" disableRipple  />
+            <Tab value="workflow" label="Workflow" disableRipple  />
+          </Tabs>
+
+          {/* Action Buttons */}
           <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              cursor:"pointer"
+              flexWrap: "wrap",
+              my: 2,
+              gap: 2,
             }}
           >
-            <Box
-             display="flex"
-             gap={2}
-            >
-              <p onClick={()=>handleTabs("extract")}  
-              style={{
-                borderBottom:tab === "extract" ?"1px solid blue" : ""
-              }}
-              >Extract Ceneter</p>
-              <p onClick={()=>handleTabs("workflow")} style={{
-                borderBottom:tab === "workflow" ?"1px solid blue" : ""
-                }}>Workflow</p>
-            </Box>
-            {
-              tab == "extract" ?
-            <Box display="flex" alignItems="center" gap={2}>
-              <Button variant="contained">Create Workflow</Button>
-              <Button variant="contained" disabled>Clone Workflow</Button>
-              <Button variant="contained" disabled>Run Extract</Button>
-            </Box>:
-            <Box display="flex" alignItems="center" gap={2}>
-              <Button variant="contained">Create Workflow</Button>
-              <Button variant="contained" disabled>Run Workflow</Button>
-              <Button variant="contained" disabled>Run State Monitor</Button>
-              <DropDown
-                value={client}
-                handleChange={handleChangeClient}
-                options={extractCenterData?.timeZone}
-                label={"Time Zone"}
-              />
-            </Box>
-
-            }
+            {tab === "extract" ? (
+              <Box display="flex" gap={2}>
+                <Button variant="contained">Create Workflow</Button>
+                <Button variant="contained" disabled>Clone Workflow</Button>
+                <Button variant="contained" disabled={!hasSelected}>
+                  Run Extract
+                </Button>
+              </Box>
+            ) : (
+              <Box display="flex" gap={2} flexWrap="wrap">
+                <Button variant="contained">Create Workflow</Button>
+                <Button variant="contained" disabled>Run Workflow</Button>
+                <Button variant="contained" disabled>Run State Monitor</Button>
+                <DropDown
+                  value={client}
+                  handleChange={handleChangeClient}
+                  options={extractCenterData?.timeZone || []}
+                  label="Time Zone"
+                />
+              </Box>
+            )}
           </Box>
-          <Box display="flex" alignItems="center"  justifyContent="center">
-            {loading ? <ScaleLoader /> :
-            <MaterialReactTable table={table} />}
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
+          {/* Table Loader / Content */}
+          <Box display="flex" justifyContent="center" minHeight="300px">
+            {loading ? <CircularProgress /> : <MaterialReactTable table={table} />}
           </Box>
         </Box>
       </Box>

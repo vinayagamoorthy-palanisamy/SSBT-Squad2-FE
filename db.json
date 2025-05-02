@@ -4,8 +4,8 @@
     {
       "extractName": "Extract1",
       "version": 8,
-      "status": "Submitted",
-      "type": "Core",
+      "status": "Published",
+      "type": "Custom",
       "parameter": "-",
       "identifier": "-",
       "format": "Formatted"
