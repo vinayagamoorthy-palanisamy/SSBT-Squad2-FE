@@ -4,7 +4,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import SubmitCoreExtract from '../components/SubmitCoreExtract';
 import SubmitCustomExtract from '../components/SubmitCustomExtract';
 import ExtractCenterTable from '../components/ExtractCenterTable';
-import ViewExtract from '../components/ViewExtract';
+import ViewEditExtractPage from '../components/ViewEditExtractPage';
+import MyModal from '../components/CustomModal';
 
 const AppRoutes = () => {
   return (
@@ -13,7 +14,9 @@ const AppRoutes = () => {
       <Route path="/extract-center" element={<ExtractCenterTable />} />
       <Route path="/submit-core-extract" element={<SubmitCoreExtract />} />
       <Route path="/submit-custom-extract" element={<SubmitCustomExtract />} />
-      <Route path="/view-extract" element={<ViewExtract />} />
+      <Route path="/view-extract" element={<ViewEditExtractPage />} />
+      <Route path="/edit-extract" element={<ViewEditExtractPage isEditable/>} />
+      <Route path="/modal" element={<MyModal/>} />
     </Routes>
   );
 };
