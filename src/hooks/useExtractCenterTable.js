@@ -3,7 +3,7 @@ import { useMaterialReactTable } from "material-react-table";
 import { TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-export const useExtractCenterTable = (data = []) => {
+export const useExtractCenterTable = (data = [], selectedClient = "All", selectedDataService = "All") => {
   const [selectedRows, setSelectedRows] = useState({});
   const [filters, setFilters] = useState({});
 
@@ -24,18 +24,19 @@ export const useExtractCenterTable = (data = []) => {
   };
 
   const filteredData = useMemo(() => {
-    console.log(data);
     return data.filter((row) => {
-      return Object.keys(filters).every((columnId) => {
-        const filterValue = filters[columnId];
-        if (!filterValue) return true;
-        return row[columnId]
-          .toString()
-          .toLowerCase()
-          .includes(filterValue.toLowerCase());
-      });
+      return (selectedClient === "All" || row.client === selectedClient) &&
+             (selectedDataService === "All" || row.dataService === selectedDataService) &&
+             Object.keys(filters).every((columnId) => {
+               const filterValue = filters[columnId];
+               if (!filterValue) return true;
+               return row[columnId]
+                 .toString()
+                 .toLowerCase()
+                 .includes(filterValue.toLowerCase());
+             });
     });
-  }, [data, filters]);
+  }, [data, filters, selectedClient, selectedDataService]);
 
   const columns = useMemo(
     () => [
@@ -52,7 +53,7 @@ export const useExtractCenterTable = (data = []) => {
         ),
         enableColumnFilter: false,
         size: 60,
-        enableSorting:false,
+        enableSorting: false,
       },
       {
         accessorKey: "extractName",
@@ -80,13 +81,8 @@ export const useExtractCenterTable = (data = []) => {
         accessorKey: "version",
         header: "Version",
         enableColumnFilter: false,
-        // Cell: ({ row }) => (
-        //   <Button onClick={() => handleVersionClick(row.original.extractName)}>
-        //     {row.original.version}
-        //   </Button>
-        // ),
       },
-      { 
+      {
         accessorKey: "status",
         header: "Status",
         enableColumnFilter: true,

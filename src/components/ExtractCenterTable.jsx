@@ -14,8 +14,6 @@ import { MaterialReactTable } from "material-react-table";
 import { useExtractCenterTable } from "../hooks/useExtractCenterTable";
 import useExtractCenterDataStore from "../store/useExtractCenterTable";
 import MyAutocomplete from "./MyAutocomplete";
-
-import { Search } from "@mui/icons-material";
 import VersionHistoryModal from './VersionHistoryModal';
 import mockVersionData from '../assets/mockData/versionHistory';
 
@@ -57,38 +55,58 @@ const theme = createTheme({
   },
 });
 
-const clientOptions = ['Hdfc', 'Hsbc', 'Axis', 'Sbi', 'Canara', 'ICICI', 'Punjab Bank'];
-
 const ExtractCenterTable = () => {
   const { extractCenterData, loading, error, fetchExtractCenterData } =
     useExtractCenterDataStore((state) => state);
 
   const [tab, setTab] = useState("extract");
-  const [client, setClient] = useState("");
   const [versionModalOpen, setVersionModalOpen] = useState(false);
-const [selectedExtractName, setSelectedExtractName] = useState('');
-const [selectedVersions, setSelectedVersions] = useState([]);
-  const { table, selectedRows } = useExtractCenterTable(
-    extractCenterData?.tableData ?? []
-  );
+  const [selectedExtractName, setSelectedExtractName] = useState('');
+  const [selectedVersions, setSelectedVersions] = useState([]);
+  const [clientOptions, setClientOptions] = useState([]);
+  const [dataServiceOptions, setDataServiceOptions] = useState([]);
+  const [selectedClient, setSelectedClient] = useState("All");
+  const [selectedDataService, setSelectedDataService] = useState("All");
+
+  useEffect(() => {
+    if (extractCenterData?.tableData?.length) {
+      const clients = new Set();
+      const dataServices = new Set();
+  
+      extractCenterData.tableData.forEach(item => {
+        if (item.client) clients.add(item.client);
+        if (item.dataService) dataServices.add(item.dataService);
+      });
+  
+      setClientOptions(["All", ...Array.from(clients)]);
+      setDataServiceOptions(["All", ...Array.from(dataServices)]);
+    }
+  }, [extractCenterData?.tableData]);
 
   useEffect(() => {
     fetchExtractCenterData();
   }, [fetchExtractCenterData]);
+
+  const { table, selectedRows } = useExtractCenterTable(
+    extractCenterData?.tableData ?? [],
+    selectedClient,
+    selectedDataService
+  );
 
   const handleTabChange = useCallback((_, newTab) => {
     setTab(newTab);
   }, []);
 
   const handleChangeClient = (value) => {
-    setClient(value);
+    setSelectedClient(value);
+  };
+
+  const handleChangeDataService = (value) => {
+    setSelectedDataService(value);
   };
 
   const hasSelected = Object.values(selectedRows).some(Boolean);
 
-  function handleChangeAutoComplete (value){
-    console.log("value",value)
-  } 
   const handleVersionClick = (extractName) => {
     setSelectedExtractName(extractName);
     setSelectedVersions(mockVersionData);
@@ -118,63 +136,60 @@ const [selectedVersions, setSelectedVersions] = useState([]);
             flexWrap: "wrap",
           }}
         >
-          
-          <MyAutocomplete label="Client Name" options={clientOptions} onChange={handleChangeAutoComplete}/>
-          <MyAutocomplete label="Data Service" options={clientOptions} onChange={handleChangeAutoComplete}/>
+          <MyAutocomplete label="Client Name" options={clientOptions} value={selectedClient} onChange={handleChangeClient} />
+          <MyAutocomplete label="Data Service" options={dataServiceOptions} value={selectedDataService} onChange={handleChangeDataService} />
         </Box>
 
         <Box sx={{ background: "white", padding: "1rem" }}>
-          <Box display="flex" justifyContent="space-between"  marginBottom="10px" >
-          <Tabs value={tab} onChange={handleTabChange}>
-            <Tab value="extract" label="Extract Center" disableRipple  />
-            <Tab value="workflow" label="Workflow" disableRipple  />
-          </Tabs>
+          <Box display="flex" justifyContent="space-between" marginBottom="10px">
+            <Tabs value={tab} onChange={handleTabChange}>
+              <Tab value="extract" label="Extract Center" disableRipple />
+              <Tab value="workflow" label="Workflow" disableRipple />
+            </Tabs>
 
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems:"center",
-              flexWrap: "wrap",
-              // my: 2,
-              gap: 2,
-            }}
-          >
-            {tab === "extract" ? (
-              <Box display="flex" gap={2} height="34px"> 
-                <Button variant="contained" sx={{height:"34px"}}>Create Workflow</Button>
-                <Button variant="contained" sx={{height:"34px"}} disabled>Clone Workflow</Button>
-                <Button variant="contained" sx={{height:"34px"}} disabled={!hasSelected}>
-                  Run Extract
-                </Button>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 2,
+              }}
+            >
+              {tab === "extract" ? (
+                <Box display="flex" gap={2} height="34px">
+                  <Button variant="contained" sx={{ height: "34px" }}>Create Workflow</Button>
+                  <Button variant="contained" sx={{ height: "34px" }} disabled>Clone Workflow</Button>
+                  <Button variant="contained" sx={{ height: "34px" }} disabled={!hasSelected}>
+                    Run Extract
+                  </Button>
+                </Box>
+              ) : (
+                <Box display="flex" gap={2} flexWrap="wrap" height="34px">
+                  <Button variant="contained" sx={{ height: "34px" }}>Create Workflow</Button>
+                  <Button variant="contained" sx={{ height: "34px" }} disabled>Run Workflow</Button>
+                  <Button variant="contained" sx={{ height: "34px" }} disabled>Run State Monitor</Button>
+                  <MyAutocomplete
+                    onChange={handleChangeClient}
+                    options={extractCenterData?.timeZone || []}
+                    label="Time Zone"
+                  />
+                </Box>
+              )}
             </Box>
-            ) : (
-              <Box display="flex" gap={2} flexWrap="wrap" height="34px">
-                <Button variant="contained" sx={{height:"34px"}}>Create Workflow</Button>
-                <Button variant="contained" sx={{height:"34px"}} disabled>Run Workflow</Button>
-                <Button variant="contained" sx={{height:"34px"}} disabled>Run State Monitor</Button>
-                <MyAutocomplete
-                  onChange={handleChangeClient}
-                  options={extractCenterData?.timeZone || []}
-                  label="Time Zone"
-              />
-              </Box>
-            )}
-            </Box>
-
           </Box>
-          
+
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
             </Alert>
           )}
           <VersionHistoryModal
-              open={versionModalOpen}
-              onClose={() => setVersionModalOpen(false)}
-              extractName={selectedExtractName}
-              versions={selectedVersions}
-            />
+            open={versionModalOpen}
+            onClose={() => setVersionModalOpen(false)}
+            extractName={selectedExtractName}
+            versions={selectedVersions}
+          />
           <Box display="flex" justifyContent="center" minHeight="300px">
             {loading ? <CircularProgress /> : <MaterialReactTable table={table} />}
           </Box>
