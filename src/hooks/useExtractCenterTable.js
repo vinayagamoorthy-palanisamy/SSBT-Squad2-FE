@@ -24,6 +24,7 @@ export const useExtractCenterTable = (data = []) => {
   };
 
   const filteredData = useMemo(() => {
+    console.log(data);
     return data.filter((row) => {
       return Object.keys(filters).every((columnId) => {
         const filterValue = filters[columnId];
@@ -79,6 +80,11 @@ export const useExtractCenterTable = (data = []) => {
         accessorKey: "version",
         header: "Version",
         enableColumnFilter: false,
+        // Cell: ({ row }) => (
+        //   <Button onClick={() => handleVersionClick(row.original.extractName)}>
+        //     {row.original.version}
+        //   </Button>
+        // ),
       },
       { 
         accessorKey: "status",

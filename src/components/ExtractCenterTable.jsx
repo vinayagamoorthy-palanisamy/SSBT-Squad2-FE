@@ -16,7 +16,8 @@ import useExtractCenterDataStore from "../store/useExtractCenterTable";
 import MyAutocomplete from "./MyAutocomplete";
 
 import { Search } from "@mui/icons-material";
-
+import VersionHistoryModal from './VersionHistoryModal';
+import mockVersionData from '../assets/mockData/versionHistory';
 
 const theme = createTheme({
   palette: {
@@ -64,7 +65,9 @@ const ExtractCenterTable = () => {
 
   const [tab, setTab] = useState("extract");
   const [client, setClient] = useState("");
-
+  const [versionModalOpen, setVersionModalOpen] = useState(false);
+const [selectedExtractName, setSelectedExtractName] = useState('');
+const [selectedVersions, setSelectedVersions] = useState([]);
   const { table, selectedRows } = useExtractCenterTable(
     extractCenterData?.tableData ?? []
   );
@@ -86,6 +89,12 @@ const ExtractCenterTable = () => {
   function handleChangeAutoComplete (value){
     console.log("value",value)
   } 
+  const handleVersionClick = (extractName) => {
+    setSelectedExtractName(extractName);
+    setSelectedVersions(mockVersionData);
+    setVersionModalOpen(true);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -138,7 +147,7 @@ const ExtractCenterTable = () => {
                 <Button variant="contained" sx={{height:"34px"}} disabled={!hasSelected}>
                   Run Extract
                 </Button>
-              </Box>
+            </Box>
             ) : (
               <Box display="flex" gap={2} flexWrap="wrap" height="34px">
                 <Button variant="contained" sx={{height:"34px"}}>Create Workflow</Button>
@@ -148,19 +157,24 @@ const ExtractCenterTable = () => {
                   onChange={handleChangeClient}
                   options={extractCenterData?.timeZone || []}
                   label="Time Zone"
-                />
+              />
               </Box>
             )}
-          </Box>
+            </Box>
 
           </Box>
-
+          
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
             </Alert>
           )}
-
+          <VersionHistoryModal
+              open={versionModalOpen}
+              onClose={() => setVersionModalOpen(false)}
+              extractName={selectedExtractName}
+              versions={selectedVersions}
+            />
           <Box display="flex" justifyContent="center" minHeight="300px">
             {loading ? <CircularProgress /> : <MaterialReactTable table={table} />}
           </Box>
