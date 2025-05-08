@@ -15,8 +15,8 @@ if (container) {
     <React.StrictMode>
       {/* <App /> */}
       <ExtractCenterTable />
-      <SubmitCoreExtract />
-      <SubmitCustomExtract />
+      {/* <SubmitCoreExtract /> */}
+      {/* <SubmitCustomExtract /> */}
     </React.StrictMode>
   );
 } else {

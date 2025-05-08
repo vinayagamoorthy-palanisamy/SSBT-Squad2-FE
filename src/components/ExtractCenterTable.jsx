@@ -11,10 +11,12 @@ import {
   Alert,
 } from "@mui/material";
 import { MaterialReactTable } from "material-react-table";
-import { useExtractCenterTable } from "../hooks/useExtractCenterTable"; // ⬅️ custom hook
+import { useExtractCenterTable } from "../hooks/useExtractCenterTable";
 import useExtractCenterDataStore from "../store/useExtractCenterTable";
-import DropDown from "./DropDown";
-import SearchableDropdown from "./SearchableDropdown";
+import MyAutocomplete from "./MyAutocomplete";
+
+import { Search } from "@mui/icons-material";
+
 
 const theme = createTheme({
   palette: {
@@ -75,12 +77,15 @@ const ExtractCenterTable = () => {
     setTab(newTab);
   }, []);
 
-  const handleChangeClient = (event) => {
-    setClient(event.target.value);
+  const handleChangeClient = (value) => {
+    setClient(value);
   };
 
   const hasSelected = Object.values(selectedRows).some(Boolean);
 
+  function handleChangeAutoComplete (value){
+    console.log("value",value)
+  } 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -95,7 +100,6 @@ const ExtractCenterTable = () => {
           minHeight: "100vh",
         }}
       >
-        {/* Dropdown filters */}
         <Box
           sx={{
             display: "flex",
@@ -105,49 +109,50 @@ const ExtractCenterTable = () => {
             flexWrap: "wrap",
           }}
         >
-          <SearchableDropdown label="Client Name" options={clientOptions} />
-          <SearchableDropdown label="Data Service" options={clientOptions} />
+          
+          <MyAutocomplete label="Client Name" options={clientOptions} onChange={handleChangeAutoComplete}/>
+          <MyAutocomplete label="Data Service" options={clientOptions} onChange={handleChangeAutoComplete}/>
         </Box>
 
-        {/* Main table section */}
         <Box sx={{ background: "white", padding: "1rem" }}>
-          {/* Tabs */}
+          <Box display="flex" justifyContent="space-between"  marginBottom="10px" >
           <Tabs value={tab} onChange={handleTabChange}>
             <Tab value="extract" label="Extract Center" disableRipple  />
             <Tab value="workflow" label="Workflow" disableRipple  />
           </Tabs>
 
-          {/* Action Buttons */}
           <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
+              alignItems:"center",
               flexWrap: "wrap",
-              my: 2,
+              // my: 2,
               gap: 2,
             }}
           >
             {tab === "extract" ? (
-              <Box display="flex" gap={2}>
-                <Button variant="contained">Create Workflow</Button>
-                <Button variant="contained" disabled>Clone Workflow</Button>
-                <Button variant="contained" disabled={!hasSelected}>
+              <Box display="flex" gap={2} height="34px"> 
+                <Button variant="contained" sx={{height:"34px"}}>Create Workflow</Button>
+                <Button variant="contained" sx={{height:"34px"}} disabled>Clone Workflow</Button>
+                <Button variant="contained" sx={{height:"34px"}} disabled={!hasSelected}>
                   Run Extract
                 </Button>
               </Box>
             ) : (
-              <Box display="flex" gap={2} flexWrap="wrap">
-                <Button variant="contained">Create Workflow</Button>
-                <Button variant="contained" disabled>Run Workflow</Button>
-                <Button variant="contained" disabled>Run State Monitor</Button>
-                <DropDown
-                  value={client}
-                  handleChange={handleChangeClient}
+              <Box display="flex" gap={2} flexWrap="wrap" height="34px">
+                <Button variant="contained" sx={{height:"34px"}}>Create Workflow</Button>
+                <Button variant="contained" sx={{height:"34px"}} disabled>Run Workflow</Button>
+                <Button variant="contained" sx={{height:"34px"}} disabled>Run State Monitor</Button>
+                <MyAutocomplete
+                  onChange={handleChangeClient}
                   options={extractCenterData?.timeZone || []}
                   label="Time Zone"
                 />
               </Box>
             )}
+          </Box>
+
           </Box>
 
           {error && (
@@ -156,7 +161,6 @@ const ExtractCenterTable = () => {
             </Alert>
           )}
 
-          {/* Table Loader / Content */}
           <Box display="flex" justifyContent="center" minHeight="300px">
             {loading ? <CircularProgress /> : <MaterialReactTable table={table} />}
           </Box>
