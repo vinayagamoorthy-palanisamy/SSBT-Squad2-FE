@@ -98,11 +98,11 @@ const ExtractCenterTable = () => {
   }, []);
 
   const handleChangeClient = (value) => {
-    setSelectedClient(value);
+    setSelectedClient(value ? value : "All");
   };
 
   const handleChangeDataService = (value) => {
-    setSelectedDataService(value);
+    setSelectedDataService(value ? value : "All");
   };
 
   const hasSelected = Object.values(selectedRows).some(Boolean);

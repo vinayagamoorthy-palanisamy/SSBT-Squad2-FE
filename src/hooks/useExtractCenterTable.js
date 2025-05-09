@@ -3,7 +3,29 @@ import { useMaterialReactTable } from "material-react-table";
 import { TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-export const useExtractCenterTable = (data = [], selectedClient = "All", selectedDataService = "All") => {
+// Reusable text filter component
+const renderTextFilter = (column, filters, handleFilterChange) => (
+  <TextField
+    variant="outlined"
+    size="small"
+    placeholder="Search"
+    value={filters[column.id] || ""}
+    onChange={(e) => handleFilterChange(column.id, e.target.value)}
+    InputProps={{
+      endAdornment: (
+        <InputAdornment position="end">
+          <SearchIcon />
+        </InputAdornment>
+      ),
+    }}
+  />
+);
+
+export const useExtractCenterTable = (
+  data = [],
+  selectedClient = "All",
+  selectedDataService = "All"
+) => {
   const [selectedRows, setSelectedRows] = useState({});
   const [filters, setFilters] = useState({});
 
@@ -25,21 +47,24 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
 
   const filteredData = useMemo(() => {
     return data.filter((row) => {
-      return (selectedClient === "All" || row.client === selectedClient) &&
-             (selectedDataService === "All" || row.dataService === selectedDataService) &&
-             Object.keys(filters).every((columnId) => {
-               const filterValue = filters[columnId];
-               if (!filterValue) return true;
-               return row[columnId]
-                 .toString()
-                 .toLowerCase()
-                 .includes(filterValue.toLowerCase());
-             });
+      return (
+        (selectedClient === "All" || row.client === selectedClient) &&
+        (selectedDataService === "All" || row.dataService === selectedDataService) &&
+        Object.keys(filters).every((columnId) => {
+          const filterValue = filters[columnId];
+          if (!filterValue) return true;
+          return row[columnId]
+            ?.toString()
+            .toLowerCase()
+            .includes(filterValue.toLowerCase());
+        })
+      );
     });
   }, [data, filters, selectedClient, selectedDataService]);
+  
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    return [
       {
         accessorKey: "select",
         header: "Select",
@@ -59,23 +84,8 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         accessorKey: "extractName",
         header: "Extract Name",
         enableColumnFilter: true,
-        filterVariant: "text",
-        Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
       },
       {
         accessorKey: "version",
@@ -86,110 +96,39 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         accessorKey: "status",
         header: "Status",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
       },
       {
         accessorKey: "type",
         header: "Extract Type",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
       },
       {
         accessorKey: "parameter",
         header: "Extract Parameter",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
       },
       {
         accessorKey: "identifier",
         header: "Extract Identifier",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
       },
       {
         accessorKey: "format",
         header: "Extract Format",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
       },
-    ],
-    [selectedRows, filters]
-  );
+    ];
+  }, [filters, selectedRows]);
 
   const table = useMaterialReactTable({
     columns,
@@ -213,9 +152,12 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
     initialState: {
       showColumnFilters: true,
       pagination: {
-        pageSize: 5,
+        pageSize: 100,
         pageIndex: 0,
       },
+    },
+    muiPaginationProps: {
+      rowsPerPageOptions: [100, 200, 500, 1000],
     },
   });
 
