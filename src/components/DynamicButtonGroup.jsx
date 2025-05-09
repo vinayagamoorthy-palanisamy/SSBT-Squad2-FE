@@ -20,6 +20,8 @@ const DynamicButtonGroup = ({
             variant={button?.variant || "contained"}
             color={button?.color || "primary"}
             onClick={button?.onClick}
+            disabled={button?.disabled}
+            sx={{color: 'FFF'}}
           >
             {button?.label}
           </Button>

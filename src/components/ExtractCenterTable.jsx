@@ -16,6 +16,7 @@ import useExtractCenterDataStore from "../store/useExtractCenterTable";
 import MyAutocomplete from "./MyAutocomplete";
 import VersionHistoryModal from './VersionHistoryModal';
 import mockVersionData from '../assets/mockData/versionHistory';
+import DynamicButtonGroup from "./DynamicButtonGroup";
 
 const theme = createTheme({
   palette: {
@@ -58,6 +59,7 @@ const theme = createTheme({
 const ExtractCenterTable = () => {
   const { extractCenterData, loading, error, fetchExtractCenterData } =
     useExtractCenterDataStore((state) => state);
+  const { extractButtons, workflowButtons } = useExtractCenterTable();
 
   const [tab, setTab] = useState("extract");
   const [versionModalOpen, setVersionModalOpen] = useState(false);
@@ -147,35 +149,24 @@ const ExtractCenterTable = () => {
               <Tab value="workflow" label="Workflow" disableRipple />
             </Tabs>
 
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: 2,
-              }}
-            >
-              {tab === "extract" ? (
-                <Box display="flex" gap={2} height="34px">
-                  <Button variant="contained" sx={{ height: "34px" }}>Create Workflow</Button>
-                  <Button variant="contained" sx={{ height: "34px" }} disabled>Clone Workflow</Button>
-                  <Button variant="contained" sx={{ height: "34px" }} disabled={!hasSelected}>
-                    Run Extract
-                  </Button>
-                </Box>
-              ) : (
-                <Box display="flex" gap={2} flexWrap="wrap" height="34px">
-                  <Button variant="contained" sx={{ height: "34px" }}>Create Workflow</Button>
-                  <Button variant="contained" sx={{ height: "34px" }} disabled>Run Workflow</Button>
-                  <Button variant="contained" sx={{ height: "34px" }} disabled>Run State Monitor</Button>
-                  <MyAutocomplete
-                    onChange={handleChangeClient}
-                    options={extractCenterData?.timeZone || []}
-                    label="Time Zone"
-                  />
-                </Box>
-              )}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems:"center",
+              flexWrap: "wrap",
+              // my: 2,
+              gap: 2,
+            }}
+          >
+            <DynamicButtonGroup buttons={ tab === "extract" ? extractButtons : workflowButtons } />
+            {tab !== "extract" && (
+                <MyAutocomplete
+                  onChange={handleChangeClient}
+                  options={extractCenterData?.timeZone || []}
+                  label="Time Zone"
+              />
+            )}
             </Box>
           </Box>
 
