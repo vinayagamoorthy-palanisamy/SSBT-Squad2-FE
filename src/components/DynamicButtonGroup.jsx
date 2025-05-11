@@ -1,31 +1,32 @@
-import React from 'react';
-import { Box, Button } from '@mui/material';
+import React from "react";
+import { Button, Grid } from "@mui/material";
+import WithCustomTheme from "./WithCustomTheme";
 
 const DynamicButtonGroup = ({
-  showBack,
-  showCancel,
-  showSave,
-  showSubmit,
-  onBack,
-  onCancel,
-  onSave,
-  onSubmit,
+  direction = "row",
+  buttons,
+  justifyContent = "flex-end",
 }) => {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        gap: 2,
-        mt: 4,
-      }}
+    <Grid
+      container
+      direction={direction}
+      spacing={2}
+      justifyContent={justifyContent}
     >
-      {showBack && <Button onClick={onBack} variant="outlined">Back</Button>}
-      {showCancel && <Button onClick={onCancel} variant="outlined">Cancel</Button>}
-      {showSave && <Button onClick={onSave} variant="contained" color="primary">Save</Button>}
-      {showSubmit && <Button onClick={onSubmit} variant="contained" color="primary">Submit</Button>}
-    </Box>
+      {buttons.map((button) => (
+        <Grid key={button?.seq}>
+          <Button
+            variant={button?.variant || "contained"}
+            color={button?.color || "primary"}
+            onClick={button?.onClick}
+          >
+            {button?.label}
+          </Button>
+        </Grid>
+      ))}
+    </Grid>
   );
 };
 
-export default DynamicButtonGroup;
+export default WithCustomTheme(DynamicButtonGroup);
