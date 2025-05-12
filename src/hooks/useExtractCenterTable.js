@@ -166,20 +166,7 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         enableColumnFilter: true,
         filterVariant: "text",
         Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+          renderTextFilter(column, filters, handleFilterChange)
         ),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
@@ -372,20 +359,7 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         header: "Status",
         enableColumnFilter: true,
         Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+          renderTextFilter(column, filters, handleFilterChange)
         ),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
@@ -480,20 +454,7 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         header: "Extract Type",
         enableColumnFilter: true,
         Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+          renderTextFilter(column, filters, handleFilterChange)
         ),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
@@ -588,20 +549,7 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         header: "Extract Parameter",
         enableColumnFilter: true,
         Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+          renderTextFilter(column, filters, handleFilterChange)
         ),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
@@ -696,20 +644,7 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         header: "Extract Identifier",
         enableColumnFilter: true,
         Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+          renderTextFilter(column, filters, handleFilterChange)
         ),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
@@ -804,20 +739,7 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         header: "Extract Format",
         enableColumnFilter: true,
         Filter: ({ column }) => (
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder={`Search `}
-            value={filters[column.id] || ""}
-            onChange={(e) => handleFilterChange(column.id, e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+          renderTextFilter(column, filters, handleFilterChange)
         ),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
