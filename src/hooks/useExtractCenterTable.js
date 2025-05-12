@@ -2,10 +2,95 @@ import { useState, useMemo } from "react";
 import { useMaterialReactTable } from "material-react-table";
 import { TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { useNavigate } from "react-router-dom";
 
-export const useExtractCenterTable = (data = []) => {
+const renderTextFilter = (column, filters, handleFilterChange) => (
+  <TextField
+    variant="outlined"
+    size="small"
+    placeholder="Search"
+    value={filters[column.id] || ""}
+    onChange={(e) => handleFilterChange(column.id, e.target.value)}
+    InputProps={{
+      endAdornment: (
+        <InputAdornment position="end">
+          <SearchIcon />
+        </InputAdornment>
+      ),
+    }}
+  />
+);
+
+export const useExtractCenterTable = (data = [], selectedClient = "All", selectedDataService = "All") => {
+  const navigate = useNavigate();
   const [selectedRows, setSelectedRows] = useState({});
   const [filters, setFilters] = useState({});
+
+   const onClickExtractHandler = (key) => {
+        switch(key){
+            case 'createExtract':
+                navigate('/create-extract');
+                break;
+            case 'cloneExtract':
+                alert('handle clone Extract');
+                break;
+            case 'runExtract':
+                alert('run extract');
+                break;
+            case 'createWorkflow':
+                alert('create Workflow');
+                break;
+            case 'cloneWorkflow':
+                alert('clone workflow');
+                break;
+            default:
+                alert('run extract workflow');
+        }
+   }
+
+   const extractButtons = [
+    {
+        seq: 50,
+        label: 'Create Extract',
+        color: 'dark',
+        onClick: () => onClickExtractHandler('createExtract')
+    },
+    {
+        seq: 51,
+        label: 'Clone Extract',
+        color: 'dark',
+        disabled: true,
+        onClick: () => onClickExtractHandler('cloneExtract')
+    },
+    {
+        seq: 52,
+        label: 'Run Extract',
+        color: 'dark',
+        disabled: true,
+        onClick: () => onClickExtractHandler('runExtract')
+    },
+   ];
+
+   const workflowButtons = [
+    {
+        seq: 53,
+        label: 'Create Overflow',
+        color: 'dark',
+        onClick: () => onClickExtractHandler('createWorkflow')
+    },
+    {
+        seq: 54,
+        label: 'Clone Overflow',
+        color: 'dark',
+        onClick: () => onClickExtractHandler('cloneWorkflow')
+    },
+    {
+        seq: 55,
+        label: 'Run State Monitor',
+        color: 'dark',
+        onClick: () => onClickExtractHandler('runStateWorkflow')
+    },
+   ];
 
   const toggleRowSelection = (rowId) => {
     setSelectedRows((prev) => ({
@@ -25,19 +110,24 @@ export const useExtractCenterTable = (data = []) => {
 
   const filteredData = useMemo(() => {
     return data.filter((row) => {
-      return Object.keys(filters).every((columnId) => {
-        const filterValue = filters[columnId];
-        if (!filterValue) return true;
-        return row[columnId]
-          .toString()
-          .toLowerCase()
-          .includes(filterValue.toLowerCase());
-      });
+      return (
+        (selectedClient === "All" || row.client === selectedClient) &&
+        (selectedDataService === "All" || row.dataService === selectedDataService) &&
+        Object.keys(filters).every((columnId) => {
+          const filterValue = filters[columnId];
+          if (!filterValue) return true;
+          return row[columnId]
+            ?.toString()
+            .toLowerCase()
+            .includes(filterValue.toLowerCase());
+        })
+      );
     });
-  }, [data, filters]);
+  }, [data, filters, selectedClient, selectedDataService]);
+  
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    return [
       {
         accessorKey: "select",
         header: "Select",
@@ -817,13 +907,13 @@ export const useExtractCenterTable = (data = []) => {
           };
         },
       },
-    ],
-    [selectedRows, filters]
-  );
+    ];
+  }, [filters, selectedRows]);
 
   const table = useMaterialReactTable({
     columns,
     data: filteredData,
+    getRowId: row => row?.id,
     enableGlobalFilter: false,
     enableTopToolbar: false,
     enablePagination: true,
@@ -850,6 +940,9 @@ export const useExtractCenterTable = (data = []) => {
         pageIndex: 0,
       },
     },
+    muiPaginationProps: {
+      rowsPerPageOptions: [100, 200, 500, 1000],
+    },
   });
 
   return {
@@ -857,5 +950,7 @@ export const useExtractCenterTable = (data = []) => {
     selectedRows,
     setSelectedRows,
     toggleRowSelection,
+    extractButtons, 
+    workflowButtons
   };
 };

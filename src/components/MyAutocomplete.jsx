@@ -1,16 +1,15 @@
 import { TextField, Typography, Box, Autocomplete } from "@mui/material";
 
-export default function MyAutocomplete({ label, options, onChange }) {
+export default function MyAutocomplete({ label, options, value, onChange }) {
   const handleChange = (event, newValue) => {
     onChange(newValue);
   };
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center", maxheight: "40px" }}>
+    <Box sx={{ display: "flex", alignItems: "center", maxHeight: "40px" }}>
       <Typography
-        variant="label"
-        component="p"
-        sx={{ fontSize: "14px", paddingRight: "12px" }}
+        variant="body2"
+        sx={{ fontSize: "14px", paddingRight: "12px", whiteSpace: "nowrap" }}
       >
         {label}:
       </Typography>
@@ -18,15 +17,19 @@ export default function MyAutocomplete({ label, options, onChange }) {
         disablePortal
         options={options}
         onChange={handleChange}
+        value={value}
         sx={{
-          width: "207px",
-          height:"40px",
+          width: 207,
           "& .MuiOutlinedInput-root": {
-              height:"40px",
+            height: "40px",
           },
         }}
         renderInput={(params) => (
-          <TextField {...params} sx={{ width: "207px", maxHeight: "40px" }} />
+          <TextField
+            {...params}
+            sx={{ width: 207, maxHeight: "40px" }}
+            size="small"
+          />
         )}
       />
     </Box>

@@ -1,16 +1,23 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
 import {
-  viewExtractButtons,
-  viewExtractDetails,
   viewExtractSQL1,
   viewExtractSQL2,
 } from "../utils/submitCustomExtractConfig";
 import DynamicExtractForm from "./DynamicExtractForm";
 import DynamicButtonGroup from "./DynamicButtonGroup";
 import QueryBuilder from "./QueryBuilder";
+import { ViewEditExtractHook } from "./viewEditExtractHook";
+import useViewEditExtract from "../store/useViewEditExtract";
 
-const ViewExtract = () => {
+const ViewEditExtractPage = () => {
+  const {
+    viewExtractButtons,
+    editExtractButtons,
+    viewExtractDetails,
+    editExtractDetails,
+  } = ViewEditExtractHook();
+  const { isEditable } = useViewEditExtract((state) => state);
   return (
     <div style={{ margin: 24, padding: 24, background: "#fefefe" }}>
       <Grid container>
@@ -20,17 +27,21 @@ const ViewExtract = () => {
           </Typography>
         </Grid>
         <Grid size={6}>
-          <DynamicButtonGroup buttons={viewExtractButtons} />
+          <DynamicButtonGroup
+            buttons={isEditable ? editExtractButtons : viewExtractButtons}
+          />
         </Grid>
       </Grid>
       <Box sx={{ paddingTop: 4 }}>
-        <DynamicExtractForm fields={viewExtractDetails} />
+        <DynamicExtractForm
+          fields={isEditable ? editExtractDetails : viewExtractDetails}
+        />
       </Box>
       <Box sx={{ mt: 4, p: 2, pt: 1, backgroundColor: "#f7f7f7" }}>
         <QueryBuilder />
       </Box>
       <Grid container rowSpacing={3} sx={{ paddingTop: 4 }}>
-        <Grid size={6}>
+        <Grid size={12}>
           <DynamicExtractForm
             color="black"
             title="Extract SQL"
@@ -47,4 +58,4 @@ const ViewExtract = () => {
   );
 };
 
-export default ViewExtract;
+export default ViewEditExtractPage;

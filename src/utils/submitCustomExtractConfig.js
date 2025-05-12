@@ -1,3 +1,7 @@
+import useCustomModal from "../store/useCustomModal";
+
+const {handleCloseModal} = useCustomModal;
+
 export const customExtractFields = [
     { label: 'Extract File Format', type: 'select', required: true, options: ['CSV'] },
     { label: 'Extract File Name Format', type: 'text', placeholder: 'App Code_Extract_Name...' },
@@ -13,30 +17,6 @@ export const customExtractFields = [
     { label: 'Extract Transmission Channel', type: 'text', required: true },
     { label: 'Extract Staging Location', type: 'text' },
     { label: 'Description', type: 'textarea' },
-  ];
-
-  export const viewExtractDetails = [
-    {
-      label: "Name",
-      type: "dataValue",
-      defaultValue: "SSDD_EXTRACT_CORE_SDO_SECURITY",
-    },
-    { label: "Extract Format", type: "dataValue", defaultValue: "Delimited" },
-    { label: "Extract Tolerance", type: "dataValue", defaultValue: "Space ()" },
-    { label: "Extract Group", type: "dataValue", defaultValue: "Group_001" },
-    { label: "Data Delimiter", type: "dataValue", defaultValue: "Space ()" },
-    { label: "Header Delimiter", type: "dataValue", defaultValue: "Space ()" },
-    { label: "Footer Delimiter", type: "dataValue", defaultValue: "Space ()" },
-    {
-      label: "Warehouse Name",
-      type: "dataValue",
-      defaultValue: "Warehouse Name1",
-    },
-    {
-      label: "Description",
-      type: "dataValue",
-      defaultValue: "Extract Configuration for RKS Security",
-    },
   ];
   
   export const viewExtractSQL1 = [
@@ -71,9 +51,9 @@ export const customExtractFields = [
     {seq: 4, label: 'Submit', color:'primary', onClick: () => console.log('Submit clicked')}
   ];
 
-  export const viewExtractButtons = [
-    {seq: 5, label: 'Edit', color:'dark', onClick: () => console.log('Edit clicked')},
-    {seq: 6, label: 'Clone Extract', color:'dark', onClick: () => console.log('Clone Extract clicked')},
-    {seq: 7, label: 'Approve', color:'dark', onClick: () => console.log('Approve clicked')},
-    {seq: 8, label: 'Reject', color:'dark', onClick: () => console.log('Reject clicked')}
+  export const aprvRjctModalButtons = [
+    {seq: 9, label: 'No', color: 'dark', variant: 'outlined', onClick: () => handleCloseModal()},
+    {seq: 9, label: 'Yes', color: 'dark', onClick: () => handleCloseModal()}
   ];
+
+  

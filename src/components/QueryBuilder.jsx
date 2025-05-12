@@ -2,16 +2,11 @@ import React from "react";
 import {
   Grid,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
-import { SQLQueryParam, tableParameters } from "../utils/submitCustomExtractConfig";
+import { SQLQueryParam } from "../utils/submitCustomExtractConfig";
+import CustomTable from "./CustomTable";
 
 const QueryBuilder = () => {
   return (
@@ -26,26 +21,7 @@ const QueryBuilder = () => {
       </Grid>
       <Grid size={6} sx={{ p: 2 }}>
         <Typography color="black">Extract Parameters</Typography>
-        <TableContainer
-          sx={{ mt: 3, border: "1px solid #e0e0e0", background: "#fff" }}
-        >
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ borderBottom: "1px solid black" }}>
-                <TableCell>Name</TableCell>
-                <TableCell>Value</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {tableParameters.map((param, index) => (
-                <TableRow key={index}>
-                  <TableCell>{param.name}</TableCell>
-                  <TableCell>{param.value}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <CustomTable customStyles={{mt: 3, border: "1px solid #e0e0e0", background: "#fff"}} />
       </Grid>
     </Grid>
   );
