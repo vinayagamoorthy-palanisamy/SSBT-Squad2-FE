@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useMaterialReactTable } from "material-react-table";
 import { TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
+import useExtractCenterDataStore from "../store/useExtractCenterTable";
 
 const renderTextFilter = (column, filters, handleFilterChange) => (
   <TextField
@@ -21,76 +22,15 @@ const renderTextFilter = (column, filters, handleFilterChange) => (
   />
 );
 
-export const useExtractCenterTable = (data = [], selectedClient = "All", selectedDataService = "All") => {
+export const useExtractCenterTable = (
+  data = [],
+  selectedClient = "All",
+  selectedDataService = "All"
+) => {
   const navigate = useNavigate();
+  const { handleSelectedRowsData } = useExtractCenterDataStore(state => state);
   const [selectedRows, setSelectedRows] = useState({});
   const [filters, setFilters] = useState({});
-
-   const onClickExtractHandler = (key) => {
-        switch(key){
-            case 'createExtract':
-                navigate('/create-extract');
-                break;
-            case 'cloneExtract':
-                alert('handle clone Extract');
-                break;
-            case 'runExtract':
-                alert('run extract');
-                break;
-            case 'createWorkflow':
-                alert('create Workflow');
-                break;
-            case 'cloneWorkflow':
-                alert('clone workflow');
-                break;
-            default:
-                alert('run extract workflow');
-        }
-   }
-
-   const extractButtons = [
-    {
-        seq: 50,
-        label: 'Create Extract',
-        color: 'dark',
-        onClick: () => onClickExtractHandler('createExtract')
-    },
-    {
-        seq: 51,
-        label: 'Clone Extract',
-        color: 'dark',
-        disabled: true,
-        onClick: () => onClickExtractHandler('cloneExtract')
-    },
-    {
-        seq: 52,
-        label: 'Run Extract',
-        color: 'dark',
-        disabled: true,
-        onClick: () => onClickExtractHandler('runExtract')
-    },
-   ];
-
-   const workflowButtons = [
-    {
-        seq: 53,
-        label: 'Create Overflow',
-        color: 'dark',
-        onClick: () => onClickExtractHandler('createWorkflow')
-    },
-    {
-        seq: 54,
-        label: 'Clone Overflow',
-        color: 'dark',
-        onClick: () => onClickExtractHandler('cloneWorkflow')
-    },
-    {
-        seq: 55,
-        label: 'Run State Monitor',
-        color: 'dark',
-        onClick: () => onClickExtractHandler('runStateWorkflow')
-    },
-   ];
 
   const toggleRowSelection = (rowId) => {
     setSelectedRows((prev) => ({
@@ -112,7 +52,8 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
     return data.filter((row) => {
       return (
         (selectedClient === "All" || row.client === selectedClient) &&
-        (selectedDataService === "All" || row.dataService === selectedDataService) &&
+        (selectedDataService === "All" ||
+          row.dataService === selectedDataService) &&
         Object.keys(filters).every((columnId) => {
           const filterValue = filters[columnId];
           if (!filterValue) return true;
@@ -124,7 +65,26 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
       );
     });
   }, [data, filters, selectedClient, selectedDataService]);
-  
+
+  useEffect(() => {
+    const tableData = filteredData.length > 0 ? filteredData : data;
+    const selectedData = Object.entries(selectedRows).reduce(
+      (acc, [key, value]) => {
+        if (value) {
+          const rowData = tableData.find(
+            (row) => row?.id?.toString() === key?.toString()
+          );
+          if (rowData) {
+            acc.push(rowData);
+          }
+        }
+        return acc;
+      },
+      []
+    );
+
+    selectedData.length > 0 && handleSelectedRowsData(selectedData);
+  }, [selectedRows, data, filteredData]);
 
   const columns = useMemo(() => {
     return [
@@ -165,9 +125,8 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         header: "Extract Name",
         enableColumnFilter: true,
         filterVariant: "text",
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -183,39 +142,46 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
               <>
                 {column.columnDef.header}
                 {column.getIsSorted() === "asc" ? (
-                <svg
-                width="8"
-                height="7"
-                viewBox="0 0 8 7"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  id="mask 2"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
-                  fill="#101114"
-                />
-              </svg>
+                  <svg
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : column.getIsSorted() === "desc" ? (
                   <svg
-                        width="8"
-                        height="7"
-                        viewBox="0 0 8 7"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          id="mask 2"
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
-                          d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
-                          fill="#101114"
-                        />
-                      </svg>
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : (
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px", }}>
+                  <div
+                    style={{
+                      display: "inline-block",
+                      marginLeft: "6px",
+                      position: "relative",
+                      bottom: "5px",
+                    }}
+                  >
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       <svg
                         width="8"
@@ -255,7 +221,6 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
             ),
           };
         },
-
       },
       {
         accessorKey: "version",
@@ -280,39 +245,46 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
               <>
                 {column.columnDef.header}
                 {column.getIsSorted() === "asc" ? (
-                <svg
-                width="8"
-                height="7"
-                viewBox="0 0 8 7"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  id="mask 2"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
-                  fill="#101114"
-                />
-              </svg>
+                  <svg
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : column.getIsSorted() === "desc" ? (
                   <svg
-                        width="8"
-                        height="7"
-                        viewBox="0 0 8 7"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          id="mask 2"
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
-                          d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
-                          fill="#101114"
-                        />
-                      </svg>
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : (
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px", }}>
+                  <div
+                    style={{
+                      display: "inline-block",
+                      marginLeft: "6px",
+                      position: "relative",
+                      bottom: "5px",
+                    }}
+                  >
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       <svg
                         width="8"
@@ -350,7 +322,6 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
                 )}
               </>
             ),
-            
           };
         },
       },
@@ -358,9 +329,8 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         accessorKey: "status",
         header: "Status",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -376,39 +346,46 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
               <>
                 {column.columnDef.header}
                 {column.getIsSorted() === "asc" ? (
-                <svg
-                width="8"
-                height="7"
-                viewBox="0 0 8 7"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  id="mask 2"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
-                  fill="#101114"
-                />
-              </svg>
+                  <svg
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : column.getIsSorted() === "desc" ? (
                   <svg
-                        width="8"
-                        height="7"
-                        viewBox="0 0 8 7"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          id="mask 2"
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
-                          d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
-                          fill="#101114"
-                        />
-                      </svg>
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : (
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px", }}>
+                  <div
+                    style={{
+                      display: "inline-block",
+                      marginLeft: "6px",
+                      position: "relative",
+                      bottom: "5px",
+                    }}
+                  >
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       <svg
                         width="8"
@@ -449,13 +426,12 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
           };
         },
       },
-      { 
+      {
         accessorKey: "type",
         header: "Extract Type",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -471,39 +447,46 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
               <>
                 {column.columnDef.header}
                 {column.getIsSorted() === "asc" ? (
-                <svg
-                width="8"
-                height="7"
-                viewBox="0 0 8 7"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  id="mask 2"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
-                  fill="#101114"
-                />
-              </svg>
+                  <svg
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : column.getIsSorted() === "desc" ? (
                   <svg
-                        width="8"
-                        height="7"
-                        viewBox="0 0 8 7"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          id="mask 2"
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
-                          d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
-                          fill="#101114"
-                        />
-                      </svg>
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : (
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px", }}>
+                  <div
+                    style={{
+                      display: "inline-block",
+                      marginLeft: "6px",
+                      position: "relative",
+                      bottom: "5px",
+                    }}
+                  >
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       <svg
                         width="8"
@@ -548,9 +531,8 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         accessorKey: "parameter",
         header: "Extract Parameter",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -566,39 +548,46 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
               <>
                 {column.columnDef.header}
                 {column.getIsSorted() === "asc" ? (
-                <svg
-                width="8"
-                height="7"
-                viewBox="0 0 8 7"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  id="mask 2"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
-                  fill="#101114"
-                />
-              </svg>
+                  <svg
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : column.getIsSorted() === "desc" ? (
                   <svg
-                        width="8"
-                        height="7"
-                        viewBox="0 0 8 7"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          id="mask 2"
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
-                          d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
-                          fill="#101114"
-                        />
-                      </svg>
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : (
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px", }}>
+                  <div
+                    style={{
+                      display: "inline-block",
+                      marginLeft: "6px",
+                      position: "relative",
+                      bottom: "5px",
+                    }}
+                  >
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       <svg
                         width="8"
@@ -643,9 +632,8 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         accessorKey: "identifier",
         header: "Extract Identifier",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -661,39 +649,46 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
               <>
                 {column.columnDef.header}
                 {column.getIsSorted() === "asc" ? (
-                <svg
-                width="8"
-                height="7"
-                viewBox="0 0 8 7"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  id="mask 2"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
-                  fill="#101114"
-                />
-              </svg>
+                  <svg
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : column.getIsSorted() === "desc" ? (
                   <svg
-                        width="8"
-                        height="7"
-                        viewBox="0 0 8 7"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          id="mask 2"
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
-                          d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
-                          fill="#101114"
-                        />
-                      </svg>
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : (
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px", }}>
+                  <div
+                    style={{
+                      display: "inline-block",
+                      marginLeft: "6px",
+                      position: "relative",
+                      bottom: "5px",
+                    }}
+                  >
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       <svg
                         width="8"
@@ -738,9 +733,8 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
         accessorKey: "format",
         header: "Extract Format",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -756,39 +750,46 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
               <>
                 {column.columnDef.header}
                 {column.getIsSorted() === "asc" ? (
-                <svg
-                width="8"
-                height="7"
-                viewBox="0 0 8 7"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  id="mask 2"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
-                  fill="#101114"
-                />
-              </svg>
+                  <svg
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.0945 0.764962C4.0425 0.713762 3.9581 0.713762 3.9057 0.764962L0.0393 4.58216C-0.0131 4.63336 -0.0131 4.71696 0.0393 4.76816L0.2277 4.95456C0.2797 5.00576 0.3645 5.00576 0.4165 4.95456L4.0001 1.41656L7.5841 4.95456C7.6361 5.00576 7.7205 5.00576 7.7725 4.95456L7.9613 4.76816C8.0133 4.71696 8.0133 4.63336 7.9613 4.58216L4.0945 0.764962Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : column.getIsSorted() === "desc" ? (
                   <svg
-                        width="8"
-                        height="7"
-                        viewBox="0 0 8 7"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          id="mask 2"
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
-                          d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
-                          fill="#101114"
-                        />
-                      </svg>
+                    width="8"
+                    height="7"
+                    viewBox="0 0 8 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      id="mask 2"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.44848 5.16446C4.50144 5.21466 4.58583 5.21305 4.63724 5.16087L8.43037 1.27084C8.48178 1.21866 8.4802 1.13507 8.42683 1.08488L8.23492 0.902094C8.18196 0.851892 8.09717 0.853504 8.04616 0.905684L4.53047 4.51118L0.87985 1.04196C0.826886 0.991762 0.742502 0.993367 0.691485 1.04555L0.506263 1.2355C0.455245 1.28768 0.456835 1.37127 0.5098 1.42147L4.44848 5.16446Z"
+                      fill="#101114"
+                    />
+                  </svg>
                 ) : (
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px", }}>
+                  <div
+                    style={{
+                      display: "inline-block",
+                      marginLeft: "6px",
+                      position: "relative",
+                      bottom: "5px",
+                    }}
+                  >
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       <svg
                         width="8"
@@ -835,7 +836,7 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
   const table = useMaterialReactTable({
     columns,
     data: filteredData,
-    getRowId: row => row?.id,
+    getRowId: (row) => row?.id,
     enableGlobalFilter: false,
     enableTopToolbar: false,
     enablePagination: true,
@@ -872,7 +873,5 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
     selectedRows,
     setSelectedRows,
     toggleRowSelection,
-    extractButtons, 
-    workflowButtons
   };
 };
