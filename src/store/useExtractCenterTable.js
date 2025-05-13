@@ -5,6 +5,7 @@ import {devtools} from 'zustand/middleware'
 
 const useExtractCenterDataStore = create(devtools((set) => ({
     extractCenterData: [],
+    selectedTableData: [],
     loading: false,
     error: null,
     fetchExtractCenterData: async () => {
@@ -17,6 +18,9 @@ const useExtractCenterDataStore = create(devtools((set) => ({
         } catch (error) {
             set({ error: error.message, loading: false });
         }
+    },
+    handleSelectedRowsData: (rowsData) => {
+        set((state) => ({ ...state, selectedTableData: rowsData }))
     }
 })));
 
