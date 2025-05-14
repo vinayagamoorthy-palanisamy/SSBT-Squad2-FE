@@ -28,7 +28,9 @@ export const useExtractCenterTable = (
   selectedDataService = "All"
 ) => {
   const navigate = useNavigate();
-  const { handleSelectedRowsData } = useExtractCenterDataStore(state => state);
+  const { handleSelectedRowsData } = useExtractCenterDataStore(
+    (state) => state
+  );
   const [selectedRows, setSelectedRows] = useState({});
   const [filters, setFilters] = useState({});
 
@@ -68,6 +70,14 @@ export const useExtractCenterTable = (
 
   useEffect(() => {
     const tableData = filteredData.length > 0 ? filteredData : data;
+    
+    console.log('selectedRows: ', selectedRows);
+    const allFalse = Object.values(selectedRows).length > 0 && Object.values(selectedRows).every(value => value === false);
+
+    if (allFalse) {
+      handleSelectedRowsData([]);
+      return;
+    }
     const selectedData = Object.entries(selectedRows).reduce(
       (acc, [key, value]) => {
         if (value) {
@@ -82,9 +92,8 @@ export const useExtractCenterTable = (
       },
       []
     );
-
     selectedData.length > 0 && handleSelectedRowsData(selectedData);
-  }, [selectedRows, data, filteredData]);
+  }, [selectedRows, data, filteredData, handleSelectedRowsData]);
 
   const columns = useMemo(() => {
     return [
