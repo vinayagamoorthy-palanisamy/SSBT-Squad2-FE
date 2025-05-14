@@ -1,10 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useMaterialReactTable } from "material-react-table";
 import { TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
 import DownArrow from "../svg/DownArrow";
 import UpArrow from "../svg/UpArrow";
+import useExtractCenterDataStore from "../store/useExtractCenterTable";
 
 const renderTextFilter = (column, filters, handleFilterChange) => (
   <TextField
@@ -23,8 +24,13 @@ const renderTextFilter = (column, filters, handleFilterChange) => (
   />
 );
 
-export const useExtractCenterTable = (data = [], selectedClient = "All", selectedDataService = "All") => {
+export const useExtractCenterTable = (
+  data = [],
+  selectedClient = "All",
+  selectedDataService = "All"
+) => {
   const navigate = useNavigate();
+  const { handleSelectedRowsData } = useExtractCenterDataStore(state => state);
   const [selectedRows, setSelectedRows] = useState({});
   const [filters, setFilters] = useState({});
   const [sorting,setSorting] = useState({
@@ -32,72 +38,6 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
     sortType:""
   })
 
-
-   const onClickExtractHandler = (key) => {
-        switch(key){
-            case 'createExtract':
-                navigate('/create-extract');
-                break;
-            case 'cloneExtract':
-                alert('handle clone Extract');
-                break;
-            case 'runExtract':
-                alert('run extract');
-                break;
-            case 'createWorkflow':
-                alert('create Workflow');
-                break;
-            case 'cloneWorkflow':
-                alert('clone workflow');
-                break;
-            default:
-                alert('run extract workflow');
-        }
-   }
-
-   const extractButtons = [
-    {
-        seq: 50,
-        label: 'Create Extract',
-        color: 'dark',
-        onClick: () => onClickExtractHandler('createExtract')
-    },
-    {
-        seq: 51,
-        label: 'Clone Extract',
-        color: 'dark',
-        disabled: true,
-        onClick: () => onClickExtractHandler('cloneExtract')
-    },
-    {
-        seq: 52,
-        label: 'Run Extract',
-        color: 'dark',
-        disabled: true,
-        onClick: () => onClickExtractHandler('runExtract')
-    },
-   ];
-
-   const workflowButtons = [
-    {
-        seq: 53,
-        label: 'Create Overflow',
-        color: 'dark',
-        onClick: () => onClickExtractHandler('createWorkflow')
-    },
-    {
-        seq: 54,
-        label: 'Clone Overflow',
-        color: 'dark',
-        onClick: () => onClickExtractHandler('cloneWorkflow')
-    },
-    {
-        seq: 55,
-        label: 'Run State Monitor',
-        color: 'dark',
-        onClick: () => onClickExtractHandler('runStateWorkflow')
-    },
-   ];
 
   const toggleRowSelection = (rowId) => {
     setSelectedRows((prev) => ({
@@ -119,7 +59,8 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
     let extractSearchData = data.filter((row) => {
       return (
         (selectedClient === "All" || row.client === selectedClient) &&
-        (selectedDataService === "All" || row.dataService === selectedDataService) &&
+        (selectedDataService === "All" ||
+          row.dataService === selectedDataService) &&
         Object.keys(filters).every((columnId) => {
           const filterValue = filters[columnId];
           if (!filterValue) return true;
@@ -148,7 +89,7 @@ export const useExtractCenterTable = (data = [], selectedClient = "All", selecte
   
     return extractSearchData;
   }, [data, filters, selectedClient, selectedDataService, sorting.sortType]);
-  
+
 
   
 function handleSortChange(column,sortType){
@@ -157,6 +98,25 @@ function handleSortChange(column,sortType){
     sortType
   })
 }
+  useEffect(() => {
+    const tableData = filteredData.length > 0 ? filteredData : data;
+    const selectedData = Object.entries(selectedRows).reduce(
+      (acc, [key, value]) => {
+        if (value) {
+          const rowData = tableData.find(
+            (row) => row?.id?.toString() === key?.toString()
+          );
+          if (rowData) {
+            acc.push(rowData);
+          }
+        }
+        return acc;
+      },
+      []
+    );
+
+    selectedData.length > 0 && handleSelectedRowsData(selectedData);
+  }, [selectedRows, data, filteredData]);
 
   const columns = useMemo(() => {
     return [
@@ -197,9 +157,8 @@ function handleSortChange(column,sortType){
         header: "Extract Name",
         enableColumnFilter: true,
         filterVariant: "text",
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -259,9 +218,8 @@ function handleSortChange(column,sortType){
         accessorKey: "status",
         header: "Status",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -290,13 +248,12 @@ function handleSortChange(column,sortType){
           };
         },
       },
-      { 
+      {
         accessorKey: "type",
         header: "Extract Type",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -329,9 +286,8 @@ function handleSortChange(column,sortType){
         accessorKey: "parameter",
         header: "Extract Parameter",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -364,9 +320,8 @@ function handleSortChange(column,sortType){
         accessorKey: "identifier",
         header: "Extract Identifier",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -399,9 +354,8 @@ function handleSortChange(column,sortType){
         accessorKey: "format",
         header: "Extract Format",
         enableColumnFilter: true,
-        Filter: ({ column }) => (
-          renderTextFilter(column, filters, handleFilterChange)
-        ),
+        Filter: ({ column }) =>
+          renderTextFilter(column, filters, handleFilterChange),
         muiTableHeadCellProps: ({ column, table }) => {
           return {
             sx: {
@@ -437,7 +391,7 @@ function handleSortChange(column,sortType){
   const table = useMaterialReactTable({
     columns,
     data:filteredData,
-    getRowId: row => row?.id,
+    getRowId: (row) => row?.id,
     enableGlobalFilter: false,
     enableTopToolbar: false,
     enablePagination: true,
@@ -474,7 +428,5 @@ function handleSortChange(column,sortType){
     selectedRows,
     setSelectedRows,
     toggleRowSelection,
-    extractButtons, 
-    workflowButtons
   };
 };

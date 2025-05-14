@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
-  Button,
   createTheme,
   ThemeProvider,
   CssBaseline,
@@ -16,7 +15,7 @@ import useExtractCenterDataStore from "../store/useExtractCenterTable";
 import MyAutocomplete from "./MyAutocomplete";
 import VersionHistoryModal from './VersionHistoryModal';
 import mockVersionData from '../assets/mockData/versionHistory';
-import DynamicButtonGroup from "./DynamicButtonGroup";
+import ExtractOverflowButtons from "./ExtractOverflowButtons";
 
 const theme = createTheme({
   palette: {
@@ -59,8 +58,6 @@ const theme = createTheme({
 const ExtractCenterTable = () => {
   const { extractCenterData, loading, error, fetchExtractCenterData } =
     useExtractCenterDataStore((state) => state);
-  const { extractButtons, workflowButtons } = useExtractCenterTable();
-
   const [tab, setTab] = useState("extract");
   const [versionModalOpen, setVersionModalOpen] = useState(false);
   const [selectedExtractName, setSelectedExtractName] = useState('');
@@ -159,7 +156,7 @@ const ExtractCenterTable = () => {
               gap: 2,
             }}
           >
-            <DynamicButtonGroup buttons={ tab === "extract" ? extractButtons : workflowButtons } />
+            <ExtractOverflowButtons tab={tab} />
             {tab !== "extract" && (
                 <MyAutocomplete
                   onChange={handleChangeClient}
