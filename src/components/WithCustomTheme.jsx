@@ -9,6 +9,10 @@ const WithCustomTheme = (WrappedComponent) => {
         main: "#46474B",
         contrastText: '#fff'
       },
+      defaultPrimary: {
+        main: "#0014BF",
+        contrastText: '#fff'
+      },
     },
   });
 

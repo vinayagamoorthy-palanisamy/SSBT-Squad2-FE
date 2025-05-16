@@ -12,7 +12,7 @@ const ExtractOverflowButtons = (tab) => {
       seq: 50,
       type: "createExtract",
       label: "Create Extract",
-      color: "dark",
+      color: "defaultPrimary",
       disabled: false,
       onClick: () => onClickExtractHandler("createExtract"),
     },
@@ -20,7 +20,7 @@ const ExtractOverflowButtons = (tab) => {
       seq: 51,
       type: "cloneExtract",
       label: "Clone Extract",
-      color: "dark",
+      color: "defaultPrimary",
       disabled: true,
       onClick: () => onClickExtractHandler("cloneExtract"),
     },
@@ -28,7 +28,7 @@ const ExtractOverflowButtons = (tab) => {
       seq: 52,
       type: "runExtract",
       label: "Run Extract",
-      color: "dark",
+      color: "defaultPrimary",
       disabled: true,
       onClick: () => onClickExtractHandler("runExtract"),
     },
@@ -38,19 +38,19 @@ const ExtractOverflowButtons = (tab) => {
     {
       seq: 53,
       label: "Create Workflow",
-      color: "dark",
+      color: "defaultPrimary",
       onClick: () => onClickExtractHandler("createWorkflow"),
     },
     {
       seq: 54,
       label: "Run Workflow",
-      color: "dark",
+      color: "defaultPrimary",
       onClick: () => onClickExtractHandler("cloneWorkflow"),
     },
     {
       seq: 55,
       label: "Run State Monitor",
-      color: "dark",
+      color: "defaultPrimary",
       onClick: () => onClickExtractHandler("runStateWorkflow"),
     },
   ];
@@ -76,44 +76,6 @@ const ExtractOverflowButtons = (tab) => {
         alert("run extract workflow");
     }
   };
-
-  //   useEffect(() => {
-  //     let updatedButtons = extractButtons;
-  //     if (selectedTableData.length > 0) {
-  //       const isExtractDisabled = selectedTableData.every(
-  //         (row) =>
-  //           row.status?.toLowerCase() === ExtractStatus &&
-  //           row.type?.toLowerCase() === ExtractType
-  //       );
-  //       updatedButtons = extractButtons?.map((button) => {
-  //         if (button?.type === "createExtract") {
-  //           button.disabled = selectedTableData?.length > 0;
-  //         }
-  //         if (button?.type === "cloneExtract") {
-  //           button.disabled =
-  //             selectedTableData.length === 0 || selectedTableData.length > 1;
-  //         }
-  //         if (button?.type === "runExtract") {
-  //           button.disabled = !isExtractDisabled;
-  //         }
-  //         return button;
-  //       });
-  //     } else {
-  //         updatedButtons = extractButtons?.map((button) => {
-  //         if (button?.type === "createExtract") {
-  //           button.disabled = false;
-  //         }
-  //         if (button?.type === "cloneExtract") {
-  //           button.disabled = true;
-  //         }
-  //         if (button?.type === "runExtract") {
-  //           button.disabled = true;
-  //         }
-  //         return button;
-  //       });
-  //     }
-  //     setExtractButtons(updatedButtons);
-  //   }, [selectedTableData]);
 
   useEffect(() => {
     const isExtractDisabled =
