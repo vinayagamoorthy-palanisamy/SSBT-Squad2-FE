@@ -24,6 +24,39 @@ const renderTextFilter = (column, filters, handleFilterChange) => (
   />
 );
 
+const renderSortableHeader = (column, handleSortChange) => (
+  <>
+    {column.columnDef.header}
+    <div
+      style={{
+        display: "inline-block",
+        marginLeft: "6px",
+        position: "relative",
+        bottom: "5px",
+        cursor: "pointer",
+      }}
+    >
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <UpArrow column={column} handleSortChange={handleSortChange} />
+        <DownArrow column={column} handleSortChange={handleSortChange} />
+      </div>
+    </div>
+  </>
+);
+
+const commonHeaderCellProps = {
+  sx: {
+    border: "1px solid #C4C8CC",
+    justifyItems: "center",
+    "& .Mui-TableHeadCell-Content": {
+      display: "flex",
+      justifyContent: "center",
+      paddingBottom: "8px",
+      flexDirection: "row",
+    },
+  },
+};
+
 export const useExtractCenterTable = (
   data = [],
   selectedClient = "All",
@@ -35,11 +68,7 @@ export const useExtractCenterTable = (
   );
   const [selectedRows, setSelectedRows] = useState({});
   const [filters, setFilters] = useState({});
-  const [sorting,setSorting] = useState({
-    id:"",
-    sortType:""
-  })
-
+  const [sorting, setSorting] = useState({ id: "", sortType: "" });
 
   const toggleRowSelection = (rowId) => {
     setSelectedRows((prev) => ({
@@ -61,45 +90,36 @@ export const useExtractCenterTable = (
     let extractSearchData = data.filter((row) => {
       return (
         (selectedClient === "All" || row.client === selectedClient) &&
-        (selectedDataService === "All" ||
-          row.dataService === selectedDataService) &&
+        (selectedDataService === "All" || row.dataService === selectedDataService) &&
         Object.keys(filters).every((columnId) => {
           const filterValue = filters[columnId];
           if (!filterValue) return true;
-          return row[columnId]
-            ?.toString()
-            .toLowerCase()
-            .includes(filterValue.toLowerCase());
+          return row[columnId]?.toString().toLowerCase().includes(filterValue.toLowerCase());
         })
       );
     });
-  
+
     if (sorting.id) {
       extractSearchData.sort((a, b) => {
-        if (typeof a[sorting.id] === 'string' && typeof b[sorting.id] === 'string') {
-          return sorting.sortType === 'asc'
+        if (typeof a[sorting.id] === "string" && typeof b[sorting.id] === "string") {
+          return sorting.sortType === "asc"
             ? a[sorting.id].localeCompare(b[sorting.id])
             : b[sorting.id].localeCompare(a[sorting.id]);
         } else {
-          // For numbers or other types
-          return sorting.sortType === 'asc'
+          return sorting.sortType === "asc"
             ? a[sorting.id] - b[sorting.id]
             : b[sorting.id] - a[sorting.id];
         }
       });
     }
-  
+
     return extractSearchData;
-  }, [data, filters, selectedClient, selectedDataService, sorting.sortType]);
+  }, [data, filters, selectedClient, selectedDataService, sorting]);
 
+  function handleSortChange(column, sortType) {
+    setSorting({ id: column.id, sortType });
+  }
 
-  
-function handleSortChange(column,sortType){
-  setSorting({
-    id : column.id,
-    sortType
-  })
-}
   useEffect(() => {
     const tableData = filteredData.length > 0 ? filteredData : data;
     
@@ -128,7 +148,7 @@ function handleSortChange(column,sortType){
   }, [selectedRows, data, filteredData, handleSelectedRowsData]);
 
   const columns = useMemo(() => {
-    return [
+    const baseColumns = [
       {
         accessorKey: "select",
         header: "Select",
@@ -143,535 +163,60 @@ function handleSortChange(column,sortType){
         enableColumnFilter: false,
         size: 60,
         enableSorting: false,
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              padding: "0",
-              "& .Mui-TableHeadCell-Content": {
-                position: "absolute",
-                bottom: "0",
-                height: "100%",
-                background: "white",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              },
+        muiTableHeadCellProps: () => ({
+          sx: {
+            border: "1px solid #C4C8CC",
+            padding: "0",
+            "& .Mui-TableHeadCell-Content": {
+              position: "absolute",
+              bottom: "0",
+              height: "100%",
+              background: "white",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             },
-          };
-        },
-      },
-      {
-        accessorKey: "extractName",
-        header: "Extract Name",
-        enableColumnFilter: true,
-        filterVariant: "text",
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}  onClick={()=>{ handleSortChange(column,"asc")}}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "version",
-        header: "Version",
-        enableColumnFilter: false,
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              alignContent: "center",
-              paddingLeft:"60px"
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "status",
-        header: "Status",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "type",
-        header: "Extract Type",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "parameter",
-        header: "Extract Parameter",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "identifier",
-        header: "Extract Identifier",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "format",
-        header: "Extract Format",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "extractFileFormat",
-        header: "Extract File Format",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "label",
-        header: "Label",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "active",
-        header: "Active",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "lastUpdateBy",
-        header: "Last Update By",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "lastUpdateAt",
-        header: "Last Update At",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "publishedBy",
-        header: "Published By",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "publishedAt",
-        header: "Published At",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
-      },
-      {
-        accessorKey: "description",
-        header: "Description ",
-        enableColumnFilter: true,
-        Filter: ({ column }) =>
-          renderTextFilter(column, filters, handleFilterChange),
-        muiTableHeadCellProps: ({ column, table }) => {
-          return {
-            sx: {
-              border: "1px solid #C4C8CC",
-              justifyItems: "center",
-              "& .Mui-TableHeadCell-Content": {
-                display: "flex",
-                justifyContent: "center",
-                paddingBottom: "8px",
-                flexDirection: "row",
-              },
-            },
-            children: (
-              <>
-                {column.columnDef.header}
-                {
-                  <div style={{ display: "inline-block", marginLeft: "6px",position:"relative",bottom:"5px",cursor:"pointer" }}   >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                    <UpArrow column={column} handleSortChange={handleSortChange}/>
-                    <DownArrow column={column} handleSortChange={handleSortChange}/>
-                    </div>
-                  </div>
-                }
-              </>
-            ),
-          };
-        },
+          },
+        }),
       },
     ];
-  }, [filters, selectedRows,sorting.sortType]);
 
+    const columnDefs = [
+      { key: "extractName", header: "Extract Name" },
+      { key: "version", header: "Version", filter: false },
+      { key: "status", header: "Status" },
+      { key: "type", header: "Extract Type" },
+      { key: "parameter", header: "Extract Parameter" },
+      { key: "identifier", header: "Extract Identifier" },
+      { key: "format", header: "Extract Format" },
+      { key: "extractFileFormat", header: "Extract File Format" },
+      { key: "label", header: "Label" },
+      { key: "active", header: "Active" },
+      { key: "lastUpdateBy", header: "Last Update By" },
+      { key: "lastUpdateAt", header: "Last Update At" },
+      { key: "publishedBy", header: "Published By" },
+      { key: "publishedAt", header: "Published At" },
+      { key: "description", header: "Description " },
+    ];
+
+    const dynamicColumns = columnDefs.map(({ key, header, filter = true }) => ({
+      accessorKey: key,
+      header,
+      enableColumnFilter: filter,
+      Filter: filter ? ({ column }) => renderTextFilter(column, filters, handleFilterChange) : undefined,
+      muiTableHeadCellProps: ({ column }) => ({
+        ...commonHeaderCellProps,
+        children: renderSortableHeader(column, handleSortChange),
+        sx: key === "version" ? { ...commonHeaderCellProps.sx, paddingLeft: "60px" } : commonHeaderCellProps.sx,
+      }),
+    }));
+
+    return [...baseColumns, ...dynamicColumns];
+  }, [filters, selectedRows, sorting]);
 
   const table = useMaterialReactTable({
     columns,
-    data:filteredData,
+    data: filteredData,
     getRowId: (row) => row?.id,
     enableGlobalFilter: false,
     enableTopToolbar: false,
@@ -680,14 +225,10 @@ function handleSortChange(column,sortType){
     enableColumnActions: false,
     enableStickyHeader: true,
     muiTableHeadCellProps: () => ({
-      sx: {
-        border: "1px solid #C4C8CC",
-      },
+      sx: { border: "1px solid #C4C8CC" },
     }),
     muiTableBodyCellProps: () => ({
-      sx: {
-        textAlign: "center",
-      },
+      sx: { textAlign: "center" },
     }),
     initialState: {
       columnPinning: {
@@ -700,7 +241,7 @@ function handleSortChange(column,sortType){
       },
     },
     muiPaginationProps: {
-      rowsPerPageOptions: [10,25,50,100, 200, 500, 1000],
+      rowsPerPageOptions: [10, 25, 50, 100, 200, 500, 1000],
     },
   });
 
