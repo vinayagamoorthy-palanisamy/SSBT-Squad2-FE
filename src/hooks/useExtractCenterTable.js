@@ -129,7 +129,7 @@ export const useExtractCenterTable = (
     }, []);
 
     selectedData.length > 0 && handleSelectedRowsData(selectedData);
-  }, [selectedRows, data, filteredData]);
+  }, [selectedRows, data, filteredData, handleSelectedRowsData]);
 
   const columns = useMemo(() => {
     const baseColumns = [
