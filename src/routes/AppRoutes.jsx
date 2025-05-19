@@ -6,8 +6,8 @@ import SubmitCustomExtract from '../components/SubmitCustomExtract';
 import ExtractCenterTable from '../components/ExtractCenterTable';
 import CoreExtractStepper from '../components/CoreExtractStepper';
 import EditableTransferList from '../components/EditableTransferList';
-
 import CreateWorkflow from '../components/CreateWorkflow';
+import DemoWorkFlow from '../components/DemoWorkFlow';
 
 const AppRoutes = () => {
   return (
@@ -19,6 +19,7 @@ const AppRoutes = () => {
       <Route path="/submit-core-extract" element={<SubmitCoreExtract />} />
       <Route path="/submit-custom-extract" element={<SubmitCustomExtract />} />
       <Route path="/create-workflow" element={<CreateWorkflow />} />
+      <Route path="/demo" element={<DemoWorkFlow />} />
       {/* <Route path="/modal" element={<MyModal/>} /> */}
     </Routes>
   );

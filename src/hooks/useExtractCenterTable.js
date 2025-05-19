@@ -191,7 +191,11 @@ export const useExtractCenterTable = (
       muiTableHeadCellProps: ({ column }) => ({
         ...commonHeaderCellProps,
         children: renderSortableHeader(column, handleSortChange),
-        sx: key === "version" ? { ...commonHeaderCellProps.sx, paddingLeft: "60px" } : commonHeaderCellProps.sx,
+        sx: key === "version" ? { ...commonHeaderCellProps.sx, 
+          border: "1px solid #C4C8CC",
+          alignContent: "center",
+          paddingLeft:"60px"
+         } : commonHeaderCellProps.sx,
       }),
     }));
 
