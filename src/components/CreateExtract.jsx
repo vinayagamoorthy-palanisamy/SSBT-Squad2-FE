@@ -3,14 +3,14 @@ import { Box, Grid } from "@mui/material";
 import DropDown from "./DropDown";
 import { useNavigate } from "react-router-dom";
 import CoreExtractStepper from "./CoreExtractStepper";
-
+const inintialCoreExtract = {
+  coreExtract: "",
+  reuseExtract: "",
+  selectExtract: "",
+};
 const CreateExtract = () => {
   const navigate = useNavigate();
-  const [coreExtract, setCoreExtract] = useState({
-    coreExtract: "",
-    reuseExtract: "",
-    selectExtract: "",
-  });
+  const [coreExtract, setCoreExtract] = useState(inintialCoreExtract);
   const [showDefineExtract, setShowDefineExtract] = useState(false);
 
   const coreExtractOptions = [
@@ -44,20 +44,28 @@ const CreateExtract = () => {
   ];
 
   const handleCoreExtract = (event, type) => {
-    const { value } = event.target;
-    setCoreExtract((prevExtract) => ({
-      ...prevExtract,
-      [type]: value,
-    }));
+    const { value } = event?.target;
+    setCoreExtract((prevExtract) => {
+      switch (type) {
+        case "coreExtract":
+          return { ...inintialCoreExtract, [type]: value };
+        case "reuseExtract":
+          return {
+            ...inintialCoreExtract,
+            coreExtract: prevExtract?.coreExtract,
+            [type]: value,
+          };
+        case "selectExtract":
+          return { ...prevExtract, [type]: value };
+        default:
+          return prevExtract;
+      }
+    });
 
-    if (
+    setShowDefineExtract(
       (type === "coreExtract" && value === "yes") ||
-      (type === "reuseExtract" && value === "no")
-    ) {
-      setShowDefineExtract(true);
-    } else {
-      setShowDefineExtract(false);
-    }
+        (type === "reuseExtract" && value === "no")
+    );
   };
 
   const dropDowns = useMemo(
@@ -81,7 +89,9 @@ const CreateExtract = () => {
         options: extractList,
         value: coreExtract.selectExtract,
         onChange: (e) => handleCoreExtract(e, "selectExtract"),
-        show: coreExtract.reuseExtract === "yes" && coreExtract.coreExtract === "no",
+        show:
+          coreExtract.reuseExtract === "yes" &&
+          coreExtract.coreExtract === "no",
         selectStyle: { width: "180px" },
       },
     ],
