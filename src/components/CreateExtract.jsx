@@ -81,7 +81,7 @@ const CreateExtract = () => {
         options: extractList,
         value: coreExtract.selectExtract,
         onChange: (e) => handleCoreExtract(e, "selectExtract"),
-        show: coreExtract.reuseExtract === "yes",
+        show: coreExtract.reuseExtract === "yes" && coreExtract.coreExtract === "no",
         selectStyle: { width: "180px" },
       },
     ],
