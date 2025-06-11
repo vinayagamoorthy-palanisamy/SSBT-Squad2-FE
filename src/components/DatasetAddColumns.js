@@ -20,6 +20,7 @@ import {
   IconButton,
   Tooltip,
   Chip,
+  Checkbox
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -119,58 +120,66 @@ const DraggableChip = ({
   );
 };
 
-const DatasetAddColumns = ({handleCloseModal,setSubmittedColumns}) => {
-  const [selectedDataset, setSelectedDataset] = useState('Dataset1');
-  const [sqlMode, setSqlMode] = useState(false);
+const DatasetAddColumns = ({ handleCloseModal, setSubmittedColumns }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [columns, setColumns] = useState([
-    'Column_4',
-    'Column_5',
-    'Column_6',
-    'Column_7',
-    'Column_8',
-    'Column_9',
-    'Column_10',
-    'Column_11',
-    'Column_74',
+    'Column_4', 'Column_5', 'Column_6', 'Column_7', 'Column_8',
+    'Column_9', 'Column_10', 'Column_11', 'Column_74', 'Column_3', 'Column_2', 'Column_1'
   ]);
-  const [selectedColumns, setSelectedColumns] = useState(new Set()); // Use a Set
-  const [activeColumn, setActiveColumn] = useState(null);
+  const [selectedColumns, setSelectedColumns] = useState(new Set());
   const [lastClickedIndex, setLastClickedIndex] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc'); // asc or desc
 
-  const moveChip = useCallback((dragIndex, hoverIndex) => {
-    setColumns((prevChips) => {
-      const newChips = [...prevChips];
-      const draggedChip = newChips[dragIndex];
-      newChips.splice(dragIndex, 1);
-      newChips.splice(hoverIndex, 0, draggedChip);
-      return newChips;
-    });
-  }, []);
+  const sortedColumns = [...columns].sort((a, b) =>
+    sortOrder === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
+  );
 
-
-  const filteredColumns = columns.filter((column) =>
+  const filteredColumns = sortedColumns.filter((column) =>
     column.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddColumns = () => {
-const selectedColumnsArray = [...selectedColumns];
+  const moveChip = useCallback((dragIndex, hoverIndex) => {
+    setColumns((prev) => {
+      const updated = [...prev];
+      const [dragged] = updated.splice(dragIndex, 1);
+      updated.splice(hoverIndex, 0, dragged);
+      return updated;
+    });
+  }, []);
 
-setSubmittedColumns(selectedColumnsArray)
- handleCloseModal()
+  const handleSelectAllChange = (e) => {
+    const checked = e.target.checked;
+    const updated = new Set(selectedColumns);
+    filteredColumns.forEach(col => {
+      checked ? updated.add(col) : updated.delete(col);
+    });
+    setSelectedColumns(updated);
   };
+
+  const handleAddColumns = () => {
+    setSubmittedColumns([...selectedColumns]);
+    handleCloseModal();
+  };
+
   return (
-    <>
     <DndProvider backend={HTML5Backend}>
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        {/* Dataset Columns Section */}
-        <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
+      <Container maxWidth="lg" sx={{ mt: 4, pb: 10 }}>
+        <Paper elevation={3} sx={{ p: 3 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h6">Add Columns</Typography>
-          
+            <FormControl size="small">
+              <InputLabel>Sort</InputLabel>
+              <Select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                label="Sort"
+              >
+                <MenuItem value="asc">Sort A → Z</MenuItem>
+                <MenuItem value="desc">Sort Z → A</MenuItem>
+              </Select>
+            </FormControl>
           </Box>
 
-          {/* Search Bar */}
           <TextField
             label="Search column"
             variant="outlined"
@@ -181,7 +190,6 @@ setSubmittedColumns(selectedColumnsArray)
             sx={{ mb: 2 }}
           />
 
-          {/* Column Grid */}
           <Grid container spacing={1}>
             {filteredColumns.map((column, index) => (
               <Grid item xs={6} sm={4} md={3} key={column}>
@@ -191,8 +199,7 @@ setSubmittedColumns(selectedColumnsArray)
                   moveChip={moveChip}
                   selectedColumns={selectedColumns}
                   setSelectedColumns={setSelectedColumns}
-                  activeColumn={activeColumn}
-                  allColumns={filteredColumns} // Pass filteredColumns
+                  allColumns={filteredColumns}
                   lastClickedIndex={lastClickedIndex}
                   setLastClickedIndex={setLastClickedIndex}
                 />
@@ -200,29 +207,68 @@ setSubmittedColumns(selectedColumnsArray)
             ))}
           </Grid>
         </Paper>
+
+        {/* Footer */}
+        <Box
+          position="fixed"
+          bottom={0}
+          left={0}
+          width="90%"
+          bgcolor="white"
+          borderTop="1px solid #ddd"
+          p={2}
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={
+                  filteredColumns.length > 0 &&
+                  filteredColumns.every((col) => selectedColumns.has(col))
+                }
+                indeterminate={
+                  selectedColumns.size > 0 &&
+                  selectedColumns.size < filteredColumns.length
+                }
+                onChange={handleSelectAllChange}
+              />
+            }
+            label="Select all"
+             sx={{
+        color: 'rgba(0, 0, 0, 0.87)', // Change label color
+        fontSize: '1rem', // Customize label font size
+        '& .MuiFormControlLabel-label': {
+          fontWeight: 'bold', // Make the label bold
+        },
+      }}
+          />
+
+          <Typography      sx={{
+        color: 'rgba(0, 0, 0, 0.87)', // Change label color
+        fontSize: '1rem', // Customize label font size
+        '& .MuiFormControlLabel-label': {
+          fontWeight: 'bold', // Make the label bold
+        },
+      }}>{selectedColumns.size} Columns Selected</Typography>
+
+          <Box display="flex" gap={2}>
+            <Button variant="outlined" onClick={handleCloseModal}>Cancel</Button>
+            <Button
+              variant="contained"
+              startIcon={<AddCircleOutlineIcon />}
+              onClick={handleAddColumns}
+              disabled={selectedColumns.size === 0}
+            >
+              Add Columns
+            </Button>
+          </Box>
+        </Box>
       </Container>
     </DndProvider>
-    <Box display="flex" gap={2}>
-        <Button
-                    variant="outlined"
-
-                    onClick={handleCloseModal}
-                  >
-                    Cancel
-                  </Button>
-                  {/* Add Columns */}
-                  <Button
-                    variant="outlined"
-                    startIcon={<AddCircleOutlineIcon />}
-                    onClick={handleAddColumns}
-                  >
-                    Add Columns
-                  </Button>
-    
-               
-                </Box>
-    </>
   );
 };
+
 
 export default DatasetAddColumns;
