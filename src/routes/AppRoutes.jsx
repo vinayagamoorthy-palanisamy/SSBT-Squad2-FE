@@ -9,7 +9,8 @@ import EditableTransferList from '../components/EditableTransferList';
 
 import CreateWorkflow from '../components/CreateWorkflow';
 import CreateExtract from '../components/CreateExtract';
-
+import DatasetDefinition from '../components/DatasetDefinition';
+//DefineCoreExtract
 const AppRoutes = () => {
   return (
     <Routes>
@@ -20,6 +21,7 @@ const AppRoutes = () => {
       <Route path="/submit-core-extract" element={<SubmitCoreExtract />} />
       <Route path="/submit-custom-extract" element={<SubmitCustomExtract />} />
       <Route path="/create-workflow" element={<CreateWorkflow />} />
+        <Route path="/DatasetDefinition" element={<DatasetDefinition />} />
       {/* <Route path="/modal" element={<MyModal/>} /> */}
     </Routes>
   );

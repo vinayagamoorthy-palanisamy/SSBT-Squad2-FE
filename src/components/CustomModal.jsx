@@ -14,10 +14,9 @@ const style = {
 };
 
 const CustomModal = () => {
-  const { isOpen, handleCloseModal, showClose, content } = useCustomModal(
+  const { isOpen, handleCloseModal, showClose, content,customStyle } = useCustomModal(
     (state) => state
   );
-
   return (
     <Modal
       open={isOpen}
@@ -25,7 +24,7 @@ const CustomModal = () => {
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
     >
-      <Box sx={style}>
+      <Box sx={customStyle?customStyle:style}>
         {showClose && (
           <IconButton
             aria-label="close"
