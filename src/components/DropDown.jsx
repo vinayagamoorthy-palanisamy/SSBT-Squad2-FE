@@ -8,13 +8,14 @@ const DropDown = ({
   placeHolder = "Select",
   selectStyle,
   color = "#101114",
+  flexDirection = "row"
 }) => {
   return (
-    <Box sx={{ minWidth: 120, display: "flex", alignItems: "center" }}>
+    <Box sx={{ minWidth: 120, display: "flex", flexDirection: {flexDirection}, alignItems: "flex-start" }}>
       <Typography
         variant="label"
         component="p"
-        sx={{ marginRight: "10px", color: color, fontSize: 14 }}
+        sx={{ marginRight: "10px", color: color, fontSize: 14, paddingBottom: 1 }}
       >
         {label}
       </Typography>
@@ -32,7 +33,8 @@ const DropDown = ({
           color: value ? color : "#8A939E",
           borderRadius: 0,
           fontSize: 14,
-          backgroundColor: '#FFF'
+          backgroundColor: '#FFF',
+          padding: "8px 12px"
         }}
         displayEmpty
       >
