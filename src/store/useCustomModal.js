@@ -4,12 +4,18 @@ import { devtools } from "zustand/middleware";
 const useCustomModal = create(devtools((set) => ({
     isOpen: false,
     showClose: false,
-    content: <></>,
+    content: <>no content to show</>,
+    title: 'Dialog',
+    fullWidth: true,
+    maxWidth: 'sm',
+    actions: null,
+    cancelText: "Cancel",
+    ConfirmText: "Confirm",
     handleOpenModal: (modalData) => {
-        set({...modalData})
+        set(state => ({...state, ...modalData}))
     },
     handleCloseModal: () => {
-        set({showClose: false, isOpen: false})
+        set(state => ({...state, isOpen: false}))
     },
 })));
 
