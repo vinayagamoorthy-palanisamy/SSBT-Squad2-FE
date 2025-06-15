@@ -12,7 +12,8 @@ import CreateWorkflow from '../components/CreateWorkflow';
 //import FilterBuilderFlow from '../components/Filter';
 import CreateExtractPage from '../components/CreateExtractPage';
 import CreateExtractCard from '../components/CreateExtractCard';
-
+import DatasetDefinition from '../components/DatasetDefinition';
+//DefineCoreExtract
 const AppRoutes = () => {
   return (
     <Routes>
@@ -25,6 +26,7 @@ const AppRoutes = () => {
       <Route path="/create-workflow" element={<CreateWorkflow />} />
       {/* <Route path="/filter"element ={<FilterBuilderFlow/>}/> */}
         <Route path='/create-extract' element={<CreateExtractPage/>} />
+        <Route path="/DatasetDefinition" element={<DatasetDefinition />} />
       {/* <Route path="/modal" element={<MyModal/>} /> */}
     </Routes>
   );
