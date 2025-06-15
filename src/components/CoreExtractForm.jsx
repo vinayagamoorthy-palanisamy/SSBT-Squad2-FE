@@ -43,7 +43,7 @@ const CoreExtractForm = () => {
 
   return (
     <Box mt={4}>
-      <Typography variant="h4" color="black">
+      <Typography variant="h6" color="black">
         Create Core Extract
       </Typography>
 

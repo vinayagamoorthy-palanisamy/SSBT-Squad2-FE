@@ -21,3 +21,21 @@ body {
 .MuiTextField-root {
   min-width: 200px !important;
 }
+/* index.css */
+
+/* --- STEP ICON OVERRIDES --- */
+.MuiStepIcon-root.Mui-active {
+  /* active step circle */
+  color: #4b5bdc !important;
+}
+
+.MuiStepIcon-root.Mui-completed {
+  /* completed step circle */
+  color: #0033cc !important;
+}
+
+/* Optional: thinner connector line */
+.MuiStepConnector-line {
+  border-top-width: 2px !important;
+  border-color: #ccc !important;
+}
