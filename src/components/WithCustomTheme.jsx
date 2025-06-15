@@ -7,11 +7,11 @@ const WithCustomTheme = (WrappedComponent) => {
     palette: {
       dark: {
         main: "#46474B",
-        contrastText: '#fff'
+        contrastText: '#000'
       },
       defaultPrimary: {
         main: "#0014BF",
-        contrastText: '#fff'
+        contrastText: '#000'
       },
     },
   });

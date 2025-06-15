@@ -1,14 +1,12 @@
+import React from 'react';
 import { Stepper, Step, StepLabel } from '@mui/material';
 
-const CreateExtractStepper = () => {
-  const steps = ['Create Core Extract', 'Submit Core Extract'];
-
+export default function CreateExtractStepper({ steps, activeStep }) {
   return (
     <Stepper
-      activeStep={0}
+      activeStep={activeStep}
       alternativeLabel
-      sx={{
-        width: '30%',
+      sx={{         width: steps.length > 2 ? "60%" : "30%",
         '& .MuiStepConnector-root': {
           top: '12px', 
 
@@ -17,9 +15,7 @@ const CreateExtractStepper = () => {
           borderTopWidth: 2,
           borderColor: '#ccc',
 
-        },
-
-      }}
+        }, }}
     >
       {steps.map((label) => (
         <Step key={label}>
@@ -28,6 +24,4 @@ const CreateExtractStepper = () => {
       ))}
     </Stepper>
   );
-};
-
-export default CreateExtractStepper;
+}
