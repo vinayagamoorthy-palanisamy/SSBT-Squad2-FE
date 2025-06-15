@@ -53,11 +53,8 @@ import React from "react";
 import {
   Dialog,
   DialogTitle,
-  DialogContent,
-  DialogActions,
   Typography,
   IconButton,
-  Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import useCustomModal from "../store/useCustomModal";
@@ -70,10 +67,7 @@ export default function CustomModal() {
     content,
     maxWidth,
     fullWidth,
-    handleConfirm,
     title,
-    cancelText,
-    confirmText,
   } = useCustomModal((state) => state);
   return (
     <Dialog
@@ -112,39 +106,7 @@ export default function CustomModal() {
           </IconButton>
         )}
       </DialogTitle>
-      <DialogContent sx={{ paddingX: 2.5, py: 1.25 }}>{content}</DialogContent>
-      <DialogActions sx={{ paddingX: 2.5 }}>
-        <Button
-          sx={{
-            borderRadius: 0,
-            textTransform: "capitalize",
-            fontSize: "14px",
-            fontWeight: 600,
-            px: 2,
-            py: 0.75,
-          }}
-          onClick={handleCloseModal}
-          color="primary"
-          variant="outlined"
-        >
-          {cancelText}
-        </Button>
-        <Button
-          sx={{
-            borderRadius: 0,
-            textTransform: "capitalize",
-            fontSize: "14px",
-            fontWeight: 600,
-            px: 2,
-            py: 0.75,
-          }}
-          onClick={handleConfirm}
-          color="primary"
-          variant="contained"
-        >
-          {confirmText}
-        </Button>
-      </DialogActions>
+     {content}
     </Dialog>
   );
 }

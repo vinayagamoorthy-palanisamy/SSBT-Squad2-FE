@@ -8,9 +8,15 @@ import {
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { AntSwitch } from "../CustomToggle";
+import ToastNotification from "./toastify";
 
 const SQLEditor = () => {
   const [editable, setEditable] = useState(false);
+  const [toast, setToast] = useState({
+    toastMessage: "",
+    toastOpen: false,
+    toastType: ""
+  });
 
   const sqlQuery = `SELECT
   SECURITY_ID, SECURITY_ID_TYPE, ZERO_PRICE_ALLOW_INDICATOR, COUNTRY_NAME, EXCHANGE_CODE, EXCHANGE_NAME,
@@ -22,12 +28,17 @@ ORDER BY
   AVG_INTEREST_RATE DESC,
   TOTAL_UNITS DESC;`;
 
-  const handleCopy = async () => {
+  const handleToast = () => {
+    setToast(prevState => ({...prevState, toastOpen: false}));
+  }
+
+  const handleCopy = async (e) => {
+    e.stopPropagation();
     try {
       await navigator.clipboard.writeText(sqlQuery);
-      alert("SQL code copied!");
+      setToast({toastMessage: "SQL code copied!", toastOpen: true, toastType: "success"});
     } catch (err) {
-      alert("Failed to copy");
+      setToast({toastMessage: "Failed to copy", toastOpen: true, toastType: "error"});
     }
   };
 
@@ -69,20 +80,28 @@ ORDER BY
         </Box>
       </Box>
     </Box>
-    <TextareaAutosize
+    <Box sx={{marginLeft: 4}}>
+        <TextareaAutosize
         value={sqlQuery}
         style={{
-          minWidth: '96%',
-          maxWidth: '96%',
+          minWidth: '100%',
+          maxWidth: '100%',
           height: '452px',
           minHeight: '112px',
           background: '#fff',
           boxSizing: 'border-box',
           borderColor: '#C4C8CC',
           padding: '8px 12px',
-          marginLeft: 32
         }}
       />
+    </Box>
+    {toast?.toastOpen &&
+    <ToastNotification
+      open={toast?.toastOpen}
+      type={toast?.toastType}
+      message={toast?.toastMessage}
+      onClose={() => handleToast()}
+    />}
     </>
   );
 };
