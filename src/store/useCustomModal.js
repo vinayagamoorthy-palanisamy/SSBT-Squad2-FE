@@ -8,9 +8,6 @@ const useCustomModal = create(devtools((set) => ({
     title: 'Dialog',
     fullWidth: true,
     maxWidth: 'sm',
-    actions: null,
-    cancelText: "Cancel",
-    ConfirmText: "Confirm",
     handleOpenModal: (modalData) => {
         set(state => ({...state, ...modalData}))
     },
