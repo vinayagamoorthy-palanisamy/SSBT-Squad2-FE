@@ -195,6 +195,7 @@ export default function DatasetDefinition() {
               <Box display="flex" gap={2}>
                 <Button
                   variant="contained"
+                  sx={primaryButtonColor}
                   startIcon={<AddCircleOutlineIcon />}
                   onClick={() => setParamPreviewOpen(true)}
                 >Preview</Button>
