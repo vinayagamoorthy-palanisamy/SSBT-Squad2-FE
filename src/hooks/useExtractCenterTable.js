@@ -63,9 +63,7 @@ export const useExtractCenterTable = (
   selectedDataService = "All"
 ) => {
   const navigate = useNavigate();
-  const { handleSelectedRowsData } = useExtractCenterDataStore(
-    (state) => state
-  );
+  const { handleSelectedRowsData } = useExtractCenterDataStore((state) => state);
   const [selectedRows, setSelectedRows] = useState({});
   const [filters, setFilters] = useState({});
   const [sorting, setSorting] = useState({ id: "", sortType: "" });
@@ -122,28 +120,14 @@ export const useExtractCenterTable = (
 
   useEffect(() => {
     const tableData = filteredData.length > 0 ? filteredData : data;
-    
-    console.log('selectedRows: ', selectedRows);
-    const allFalse = Object.values(selectedRows).length > 0 && Object.values(selectedRows).every(value => value === false);
+    const selectedData = Object.entries(selectedRows).reduce((acc, [key, value]) => {
+      if (value) {
+        const rowData = tableData.find((row) => row?.id?.toString() === key?.toString());
+        if (rowData) acc.push(rowData);
+      }
+      return acc;
+    }, []);
 
-    if (allFalse) {
-      handleSelectedRowsData([]);
-      return;
-    }
-    const selectedData = Object.entries(selectedRows).reduce(
-      (acc, [key, value]) => {
-        if (value) {
-          const rowData = tableData.find(
-            (row) => row?.id?.toString() === key?.toString()
-          );
-          if (rowData) {
-            acc.push(rowData);
-          }
-        }
-        return acc;
-      },
-      []
-    );
     selectedData.length > 0 && handleSelectedRowsData(selectedData);
   }, [selectedRows, data, filteredData, handleSelectedRowsData]);
 
@@ -207,7 +191,11 @@ export const useExtractCenterTable = (
       muiTableHeadCellProps: ({ column }) => ({
         ...commonHeaderCellProps,
         children: renderSortableHeader(column, handleSortChange),
-        sx: key === "version" ? { ...commonHeaderCellProps.sx, paddingLeft: "60px" } : commonHeaderCellProps.sx,
+        sx: key === "version" ? { ...commonHeaderCellProps.sx, 
+          border: "1px solid #C4C8CC",
+          alignContent: "center",
+          paddingLeft:"60px"
+         } : commonHeaderCellProps.sx,
       }),
     }));
 
