@@ -1,0 +1,275 @@
+import React, { useState, useMemo, useCallback } from 'react';
+import {
+  Box,
+  Typography,
+  TextField,
+  Tabs,
+  Tab,
+  Grid,
+  Button,
+  Chip,
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  InputAdornment,
+  Tooltip,
+  Divider,
+  Switch
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
+import SearchIcon from '@mui/icons-material/Search';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
+/**
+ * Content component for "Add Functions" dialog.
+ * Open via custom modal: handleOpenModal({ content: <DatasetAddFunctions .../> })
+ */
+const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
+  const textColsRaw = columnsByType.text || [];
+  const numColsRaw = columnsByType.number?.length ? columnsByType.number : textColsRaw;
+  const dateColsRaw = columnsByType.date?.length ? columnsByType.date : textColsRaw;
+  const boolColsRaw = columnsByType.boolean?.length ? columnsByType.boolean : textColsRaw;
+
+  const [tab, setTab] = useState(0);
+  const [searchText, setSearchText] = useState('');
+  const [sortAsc, setSortAsc] = useState(true);
+  const [editorMode, setEditorMode] = useState(false);
+  const [selectedCols, setSelectedCols] = useState(new Set());
+  const [selectedFuncs, setSelectedFuncs] = useState(new Set());
+  const [aliasText, setAliasText] = useState('');
+  const [codeText, setCodeText] = useState('');
+  const [applied, setApplied] = useState([]);
+
+  const FUNCTION_CONFIG = {
+    text: [
+      { id: 'UPPER', desc: 'Convert string to uppercase', type: 'SCALAR' },
+      { id: 'LOWER', desc: 'Convert string to lowercase', type: 'SCALAR' },
+      { id: 'TRIM', desc: 'Remove whitespace', type: 'SCALAR' },
+      { id: 'LENGTH', desc: 'Count letters', type: 'SCALAR' }
+    ],
+    number: [
+      { id: 'SUM', desc: 'Total sum', type: 'AGGREGATE' },
+      { id: 'AVG', desc: 'Average value', type: 'AGGREGATE' },
+      { id: 'MAX', desc: 'Largest value', type: 'AGGREGATE' },
+      { id: 'MIN', desc: 'Smallest value', type: 'AGGREGATE' }
+    ],
+    date: [
+      { id: 'COUNT', desc: 'Count dates', type: 'AGGREGATE' },
+      { id: 'MIN', desc: 'Earliest date', type: 'AGGREGATE' },
+      { id: 'MAX', desc: 'Latest date', type: 'AGGREGATE' }
+    ],
+    boolean: [
+      { id: 'COUNT', desc: 'Count TRUE', type: 'AGGREGATE' },
+      { id: 'SUM', desc: 'Sum TRUE', type: 'AGGREGATE' },
+      { id: 'MAX', desc: 'Any TRUE', type: 'AGGREGATE' }
+    ]
+  };
+  const columnTypes = ['text', 'number', 'date', 'boolean'];
+  const tabLabels = ['Text Columns', 'Number Columns', 'Date Columns', 'Boolean Columns', 'Applied Functions'];
+
+  const displayCols = useMemo(() => {
+    let list = [];
+    if (tab === 0) list = textColsRaw;
+    else if (tab === 1) list = numColsRaw;
+    else if (tab === 2) list = dateColsRaw;
+    else if (tab === 3) list = boolColsRaw;
+    const filtered = list.filter(c => c.toLowerCase().includes(searchText.toLowerCase()));
+    return sortAsc ? filtered.slice().sort() : filtered.slice().sort().reverse();
+  }, [textColsRaw, numColsRaw, dateColsRaw, boolColsRaw, tab, searchText, sortAsc]);
+
+  const handleColClick = useCallback(col => {
+    setSelectedCols(prev => {
+      const next = new Set(prev);
+      next.has(col) ? next.delete(col) : next.add(col);
+      return next;
+    });
+  }, []);
+
+  const handleFuncToggle = useCallback(fn => {
+    setSelectedFuncs(prev => {
+      const next = new Set(prev);
+      next.has(fn) ? next.delete(fn) : next.add(fn);
+      return next;
+    });
+  }, []);
+
+  const applyFunction = () => {
+    const newFns = [];
+    if (editorMode) {
+      codeText.split(';').forEach(expr => {
+        const trimmed = expr.trim();
+        if (trimmed) newFns.push({ column: null, expression: trimmed });
+      });
+    } else {
+      selectedCols.forEach(col => selectedFuncs.forEach(fn => {
+        const expr = `${fn}(${col})${aliasText ? ` AS ${aliasText}` : ''}`;
+        newFns.push({ column: col, expression: expr });
+      }));
+    }
+    setApplied(prev => [...prev, ...newFns]);
+    setSelectedCols(new Set());
+    setSelectedFuncs(new Set());
+    setAliasText('');
+    setCodeText('');
+    setTab(4);
+  };
+
+  const moveFunction = useCallback((from, to) => {
+    setApplied(prev => {
+      const arr = [...prev];
+      const [item] = arr.splice(from, 1);
+      arr.splice(to, 0, item);
+      return arr;
+    });
+  }, []);
+
+  const handleDone = () => { onApply(applied); onClose(); };
+
+  const DraggableFn = ({ fn, idx }) => {
+    const [{ isDragging }, drag] = useDrag({ type: 'FN', item: { idx }, collect: m => ({ isDragging: m.isDragging() }) });
+    const [, drop] = useDrop({ accept: 'FN', hover: item => {
+      if (item.idx !== idx) { moveFunction(item.idx, idx); item.idx = idx; }
+    }});
+    return (
+      <div ref={node => drag(drop(node))} style={{ opacity: isDragging ? 0.5 : 1 }}>
+        <Tooltip title={fn.expression}>
+          <Chip
+            label={fn.expression.length > 25 ? `${fn.expression.slice(0,25)}...` : fn.expression}
+            onDelete={() => setApplied(prev => prev.filter((_,i) => i!==idx))}
+            variant="outlined"
+            sx={{
+              backgroundColor: 'rgba(25,118,210,0.1)',
+              borderColor: '#1976d2',
+              color: '#1976d2',
+              m: 0.5
+            }}
+          />
+        </Tooltip>
+      </div>
+    );
+  };
+
+  return (
+    <Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h6">Add Functions</Typography>
+        <IconButton onClick={onClose}><CloseIcon /></IconButton>
+      </Box>
+
+      <Box display="flex" gap={2} mb={2}>
+        <TextField
+          fullWidth size="small" placeholder="Search column"
+          value={searchText} onChange={e => setSearchText(e.target.value)}
+          InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon/></InputAdornment> }}
+        />
+        <Box display="flex" flexDirection="column" alignItems="flex-end">
+          <SortByAlphaIcon sx={{ cursor: 'pointer' }} onClick={() => setSortAsc(v => !v)} />
+          <Typography variant="caption">Sort A→Z</Typography>
+        </Box>
+      </Box>
+
+      <Box display="flex" alignItems="center" mb={2}>
+        <Tabs value={tab} onChange={(_,v) => setTab(v)} sx={{ flex: 1 }}>
+          {tabLabels.map((l,i) => <Tab key={i} label={l} />)}
+        </Tabs>
+        <FormControlLabel
+          control={<Switch size="small" checked={editorMode} onChange={() => setEditorMode(e => !e)} />}
+          label="Editor Mode"
+          sx={{ color: '#000' }}
+        />
+      </Box>
+
+      {tab < 4 ? (
+        <Box display="flex" gap={2}>
+          <Box flex={1}>
+            <Typography variant="subtitle2" sx={{ mb:1 }}>Select Column</Typography>
+            {displayCols.length ? (
+              <Grid container spacing={1}>
+                {displayCols.map(col => (
+                  <Grid item xs={3} key={col}>
+                    <Chip
+                      label={col}
+                      clickable
+                      onClick={() => handleColClick(col)}
+                      sx={{
+                        width: '100%',
+                        textAlign: 'center',
+                        border: '1px solid',
+                        borderColor: selectedCols.has(col) ? '#1976d2' : 'rgba(0, 0, 0, 0.23)',
+                        backgroundColor: selectedCols.has(col) ? 'rgba(25,118,210,0.1)' : '#fff',
+                        color: selectedCols.has(col) ? '#1976d2' : '#000',
+                        px: 2,
+                        mb: 1
+                      }}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <Typography color="text.secondary" sx={{ mt:2 }}>No columns available.</Typography>
+            )}
+          </Box>
+
+          <Box sx={{ width: 300 }}>
+            {editorMode ? (
+              <>
+                <Typography variant="subtitle1" sx={{ mb:1, color: '#000' }}>Function Code Editor</Typography>
+                <Typography variant="body2" sx={{ mb:1, color: '#000' }}>Apply any scalar or aggregate functions using this code editor. Use ';' to separate each function.</Typography>
+                <TextField
+                  multiline
+                  minRows={8}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter column functions (e.g. SUBSTRING(Column_7, 1, 5); Concat(Column_4, Column_7);)"
+                  value={codeText}
+                  onChange={e => setCodeText(e.target.value)}
+                />
+                <Button variant="contained" size="small" sx={{ mt:1 }} onClick={applyFunction} disabled={!codeText.trim()}>Apply Function</Button>
+              </>
+            ) : (
+              <>
+                <Typography variant="subtitle1" sx={{ mb:1, color: '#000' }}>Select Functions</Typography>
+                {FUNCTION_CONFIG[columnTypes[tab]].filter(f => f.type === 'SCALAR').map(f => (
+                  <FormControlLabel
+                    key={f.id}
+                    control={<Checkbox size="small" checked={selectedFuncs.has(f.id)} onChange={() => handleFuncToggle(f.id)} />}
+                    label={<><strong style={{ color: '#000' }}>{f.id}(Col)</strong>: {f.desc}</>}
+                    sx={{ color: '#000' }}
+                  />
+                ))}
+                <Divider sx={{ my:1 }} />
+                {FUNCTION_CONFIG[columnTypes[tab]].filter(f => f.type === 'AGGREGATE').map(f => (
+                  <FormControlLabel
+                    key={f.id}
+                    control={<Checkbox size="small" checked={selectedFuncs.has(f.id)} onChange={() => handleFuncToggle(f.id)} />}
+                    label={<><strong style={{ color: '#000' }}>{f.id}(Col)</strong>: {f.desc}</>}
+                    sx={{ color: '#000' }}
+                  />
+                ))}
+                <Box mt={2} display="flex" flexDirection="column" gap={1}>
+                  <TextField size="small" placeholder="Show As" value={aliasText} onChange={e => setAliasText(e.target.value)} />
+                  <Button variant="contained" size="small" onClick={applyFunction} disabled={selectedCols.size === 0 || selectedFuncs.size === 0}>Apply Function</Button>
+                </Box>
+              </>
+            )}
+          </Box>
+        </Box>
+      ) : (
+        <DndProvider backend={HTML5Backend}>
+          <Box display="flex" flexWrap="wrap">
+            {applied.map((fn, i) => <DraggableFn fn={fn} idx={i} key={i} />)}
+          </Box>
+        </DndProvider>
+      )}
+
+      <Box display="flex" justifyContent="flex-end" mt={3}>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button variant="contained" onClick={handleDone}>Done</Button>
+      </Box>
+    </Box>
+  );
+};
+
+export default DatasetAddFunctions;
