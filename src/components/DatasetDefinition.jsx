@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import FunctionsIcon from '@mui/icons-material/Functions';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
@@ -91,7 +92,8 @@ const DraggableChip = ({
           borderRadius: 2,
           textAlign: 'center',
           cursor: 'grab',
-          '&:hover': { bgcolor: isSelected ? '#1565c0' : '#f0f0f0' }
+          '&:hover': { bgcolor: isSelected ? '#1565c0' : '#f0f0f0' },
+          width: 250
         }}
       >
         {column}
@@ -179,6 +181,9 @@ export default function DatasetDefinition() {
           onApply={funcs => { setSubmittedFunctions(funcs); handleCloseModal(); }}
         />
       ),
+      title: 'Add Functions',
+      fullWidth: true,
+      maxWidth: 'lg',
       customStyle: { position: 'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:920, bgcolor:'background.paper', boxShadow:24, p:4 }
     });
   };
@@ -186,54 +191,77 @@ export default function DatasetDefinition() {
   return (
     <DndProvider backend={HTML5Backend}>
       <Container maxWidth="lg" sx={{ mt:4 }}>
-        <Typography variant="h4" gutterBottom>Define Dataset</Typography>
+        <Typography variant="h4" gutterBottom style={{color: '#000000'}}>Define Dataset</Typography>
 
         <Paper sx={{ mb:3, p:3 }} elevation={3}>
           <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Box flexGrow={1}><Typography variant="h6">Holdings</Typography></Box>
+            <AccordionSummary 
+            expandIcon={<ExpandMoreIcon />} 
+            sx={{
+              flexDirection: 'row-reverse',
+              '& .MuiAccordionSummary-expandIconWrapper': {
+                marginLeft: 'auto',
+              },
+            }}
+            >
+              <Box flexGrow={1} marginLeft={3}>
+                <Typography variant="h6" fontWeight={'bold'}>Holdings</Typography>
+                </Box>
               <Box display="flex" gap={2}>
                 <Button
+                style={{color:'#0014BF', border: '1px solid #0014BF', fontWeight: 'bold'}}
+                  color='#0014BF'
                   variant="contained"
-                  startIcon={<AddCircleOutlineIcon />}
+                  startIcon={<RemoveRedEyeIcon />}
                   onClick={() => setParamPreviewOpen(true)}
                 >Preview</Button>
-                <FormGroup>
-                  <FormControlLabel control={<Switch checked={sqlMode} onChange={()=>setSqlMode(m=>!m)}/>} label="SQL Mode" />
-                </FormGroup>
+                
               </Box>
             </AccordionSummary>
-            <AccordionDetails>
-              <FormControl fullWidth>
+            <AccordionDetails 
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+            >
+              <FormControl style={{width:'300px'}} >
                 <InputLabel>Select Dataset *</InputLabel>
                 <Select value={selectedDataset} label="Select Dataset *" onChange={e=>setSelectedDataset(e.target.value)}>
                   <MenuItem value="Dataset1">Dataset 1</MenuItem>
                   <MenuItem value="Dataset2">Dataset 2</MenuItem>
                 </Select>
               </FormControl>
+              <FormGroup>
+                  <FormControlLabel control={<Switch checked={sqlMode} onChange={()=>setSqlMode(m=>!m)}/>} label="SQL Mode" />
+                </FormGroup>
             </AccordionDetails>
           </Accordion>
         </Paper>
 
-        <Paper sx={{ p:3 }} elevation={3}>
-          <Box display="flex" justifyContent="space-between" mb={2}>
-            <Typography variant="h6">Dataset Columns</Typography>
+        <Paper  elevation={3}>
+          <Box sx={{ paddingLeft:3, paddingRight: 3, paddingTop: 2, paddingBottom: 2 }} display="flex" justifyContent="space-between" mb={2} backgroundColor={'#F0F2F5'}>
+            <Typography fontWeight={'bold'} variant="h6">Dataset Columns</Typography>
             <Box display="flex" gap={2}>
-              <Button variant="contained" onClick={handleAddColumns} sx={primaryButtonColor} startIcon={<AddCircleOutlineIcon />}>Add Columns</Button>
-              <Button variant="contained" onClick={handleAddFunctions} sx={primaryButtonColor} startIcon={<FunctionsIcon />}>Add Functions</Button>
-              <Button variant="contained" onClick={()=>setIsSidebarOpen(b=>!b)} sx={primaryButtonColor} startIcon={<ListAltIcon />}>List View</Button>
+              <Button  sx={{color:'#0014BF', fontWeight: 'bold', backgroundColor: '#F0F2F5'}}
+               onClick={handleAddColumns}  startIcon={<AddCircleOutlineIcon />}>Add Columns</Button>
+              <Button  onClick={handleAddFunctions}  sx={{backgroundColor: '#F0F2F5', color:'#0014BF', fontWeight: 'bold'}} startIcon={<AddCircleOutlineIcon />}>Add Functions</Button>
+              <Button  onClick={()=>setIsSidebarOpen(b=>!b)}  sx={{backgroundColor: '#F0F2F5', color:'#0014BF', fontWeight: 'bold'}} startIcon={<ListAltIcon />}>List View</Button>
             </Box>
           </Box>
-
+          <Box sx={{ p:3 }}>
           <TextField fullWidth size="small" placeholder="Search column" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} sx={{ mb:2 }} />
 
           <Grid container spacing={1}>
             {filteredColumns.map((col,i)=>(
               <Grid item xs={6} sm={4} md={3} key={col}>
                 <DraggableChip
-                  column={col} index={i} moveChip={moveChip}
-                  selectedColumns={selectedColumns} setSelectedColumns={setSelectedColumns}
-                  allColumns={filteredColumns} lastClickedIndex={lastClickedIndex}
+                  column={col} index={i} 
+                  moveChip={moveChip}
+                  selectedColumns={selectedColumns} 
+                  setSelectedColumns={setSelectedColumns}
+                  allColumns={filteredColumns} 
+                  lastClickedIndex={lastClickedIndex}
                   setLastClickedIndex={setLastClickedIndex}
                 />
               </Grid>
@@ -241,6 +269,7 @@ export default function DatasetDefinition() {
           </Grid>
 
           <DatasetListView isSidebarOpen={isSidebarOpen} toggleSidebar={()=>setIsSidebarOpen(o=>!o)}/>
+            </Box>
         </Paper>
 
         {/* Parameter preview first */}
