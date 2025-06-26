@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -14,14 +14,19 @@ import {
   InputAdornment,
   Tooltip,
   Divider,
-  Switch
+  Switch,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
 import SearchIcon from '@mui/icons-material/Search';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-
+import ToastNotification from './toastify';
+import CircleIcon from '@mui/icons-material/Circle';
 /**
  * Content component for "Add Functions" dialog.
  * Open via custom modal: handleOpenModal({ content: <DatasetAddFunctions .../> })
@@ -41,6 +46,9 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
   const [aliasText, setAliasText] = useState('');
   const [codeText, setCodeText] = useState('');
   const [applied, setApplied] = useState([]);
+  const [sortOrder, setSortOrder] = useState('')
+  const [toastOpen, setToastOpen] = useState(false)
+  const [notification, setNotification] = useState(false)
 
   const FUNCTION_CONFIG = {
     text: [
@@ -95,6 +103,12 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
     });
   }, []);
 
+  useEffect(() => {
+    if(tab === 4){
+      setNotification(false)
+    }
+  }, [tab])
+
   const applyFunction = () => {
     const newFns = [];
     if (editorMode) {
@@ -105,16 +119,20 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
     } else {
       selectedCols.forEach(col => selectedFuncs.forEach(fn => {
         const expr = `${fn}(${col})${aliasText ? ` AS ${aliasText}` : ''}`;
-        newFns.push({ column: col, expression: expr });
+        const exists =   applied?.some(item => item?.column === col && item?.expression === expr)
+        if(!exists) newFns.push({ column: col, expression: expr });
       }));
     }
     setApplied(prev => [...prev, ...newFns]);
+    setToastOpen(true)
+    setNotification(true)
     setSelectedCols(new Set());
     setSelectedFuncs(new Set());
     setAliasText('');
     setCodeText('');
-    setTab(4);
+    // setTab(4);
   };
+
 
   const moveFunction = useCallback((from, to) => {
     setApplied(prev => {
@@ -140,39 +158,67 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
             onDelete={() => setApplied(prev => prev.filter((_,i) => i!==idx))}
             variant="outlined"
             sx={{
-              backgroundColor: 'rgba(25,118,210,0.1)',
-              borderColor: '#1976d2',
-              color: '#1976d2',
-              m: 0.5
+              backgroundColor: '#ffffff',
+              borderColor: '#0F8048',
+              color: '#0F8048',
+              m: 0.5,
+              width: 250,
+              '& .MuiChip-label': {
+              flexGrow: 1,
+              textAlign: 'center',
+              paddingLeft: 0,
+              paddingRight: 0,
+            },
+            '& .MuiChip-deleteIcon': {
+              marginLeft: 'auto',
+            },
             }}
           />
         </Tooltip>
       </div>
     );
   };
-
+  
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+    <Box sx={{ backgroundColor:'#F0F2F5'}}>
+      {/* <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h6">Add Functions</Typography>
         <IconButton onClick={onClose}><CloseIcon /></IconButton>
-      </Box>
+      </Box> */}
 
-      <Box display="flex" gap={2} mb={2}>
+      <Box display="flex" gap={2} mb={2} sx={{paddingLeft:3, paddingRight: 3, paddingTop: 2, paddingBottom: 0}}>
         <TextField
           fullWidth size="small" placeholder="Search column"
           value={searchText} onChange={e => setSearchText(e.target.value)}
           InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon/></InputAdornment> }}
         />
         <Box display="flex" flexDirection="column" alignItems="flex-end">
-          <SortByAlphaIcon sx={{ cursor: 'pointer' }} onClick={() => setSortAsc(v => !v)} />
-          <Typography variant="caption">Sort A→Z</Typography>
+          <FormControl size="small" sx={{width: 120}}>
+              <InputLabel>Sort</InputLabel>
+              <Select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} label="Sort">
+                <MenuItem value="asc">Sort A - Z</MenuItem>
+                <MenuItem value="desc">Sort Z - A</MenuItem>
+              </Select>
+            </FormControl>
         </Box>
       </Box>
 
+      <Box sx={{backgroundColor:'#ffffff', p:3}}>
       <Box display="flex" alignItems="center" mb={2}>
-        <Tabs value={tab} onChange={(_,v) => setTab(v)} sx={{ flex: 1 }}>
-          {tabLabels.map((l,i) => <Tab key={i} label={l} />)}
+        <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ flex: 1 }}>
+          {tabLabels.map((label, i) => (
+            <Tab
+              key={i}
+              label={
+                <Box display="flex" alignItems="center">
+                  <Typography fontWeight="bold">{label}</Typography>
+                  {i === 4 && notification && (
+                    <CircleIcon sx={{ fontSize: 10, color: 'red', marginLeft: 1 }} />
+                  )}
+                </Box>
+              }
+            />
+          ))}
         </Tabs>
         <FormControlLabel
           control={<Switch size="small" checked={editorMode} onChange={() => setEditorMode(e => !e)} />}
@@ -184,17 +230,18 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
       {tab < 4 ? (
         <Box display="flex" gap={2}>
           <Box flex={1}>
-            <Typography variant="subtitle2" sx={{ mb:1 }}>Select Column</Typography>
+            <Typography variant="subtitle2" sx={{ mb:1, fontWeight: 'bold', fontSize: 16 }}>Select Column</Typography>
             {displayCols.length ? (
               <Grid container spacing={1}>
                 {displayCols.map(col => (
-                  <Grid item xs={3} key={col}>
+                  <Grid item xs={5} key={col}>
                     <Chip
                       label={col}
                       clickable
                       onClick={() => handleColClick(col)}
                       sx={{
-                        width: '100%',
+                        // width: '100%',
+                        width: 250,
                         textAlign: 'center',
                         border: '1px solid',
                         borderColor: selectedCols.has(col) ? '#1976d2' : 'rgba(0, 0, 0, 0.23)',
@@ -212,7 +259,7 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
             )}
           </Box>
 
-          <Box sx={{ width: 300 }}>
+          {selectedCols.size !== 0 && <Box sx={{ width: 300 }}>
             {editorMode ? (
               <>
                 <Typography variant="subtitle1" sx={{ mb:1, color: '#000' }}>Function Code Editor</Typography>
@@ -230,22 +277,27 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
               </>
             ) : (
               <>
-                <Typography variant="subtitle1" sx={{ mb:1, color: '#000' }}>Select Functions</Typography>
+                <Typography variant="subtitle1" sx={{ mb:1, color: '#000', fontWeight: 'bold' }}>Select Functions</Typography>
+
+                {FUNCTION_CONFIG[columnTypes[tab]].filter(f => f.type === 'SCALAR').length > 0 && <Typography variant="subtitle1" sx={{ mb:1, color: '#000' , fontStyle: 'italic'}}>SCALAR</Typography>}
+
                 {FUNCTION_CONFIG[columnTypes[tab]].filter(f => f.type === 'SCALAR').map(f => (
                   <FormControlLabel
                     key={f.id}
-                    control={<Checkbox size="small" checked={selectedFuncs.has(f.id)} onChange={() => handleFuncToggle(f.id)} />}
-                    label={<><strong style={{ color: '#000' }}>{f.id}(Col)</strong>: {f.desc}</>}
-                    sx={{ color: '#000' }}
+                    control={<Checkbox size="small"  checked={selectedFuncs.has(f.id)} onChange={() => handleFuncToggle(f.id)} />}
+                    label={<><p style={{ margin: 0, padding: 0, }}>{f.id}(Col): {f.desc}</p></>}
+                    sx={{ color: '#000', display: 'flex', alignItems  : 'center', padding: 0.5 }}
                   />
                 ))}
-                <Divider sx={{ my:1 }} />
+
+                {FUNCTION_CONFIG[columnTypes[tab]].filter(f => f.type === 'AGGREGATE').length > 0 && <Typography variant="subtitle1" sx={{ mb:1, color: '#000', fontStyle: 'italic' }}>AGGREGATE</Typography>}
+
                 {FUNCTION_CONFIG[columnTypes[tab]].filter(f => f.type === 'AGGREGATE').map(f => (
                   <FormControlLabel
                     key={f.id}
                     control={<Checkbox size="small" checked={selectedFuncs.has(f.id)} onChange={() => handleFuncToggle(f.id)} />}
-                    label={<><strong style={{ color: '#000' }}>{f.id}(Col)</strong>: {f.desc}</>}
-                    sx={{ color: '#000' }}
+                   label={<><p style={{ margin: 0, padding: 0, }}>{f.id}(Col): {f.desc}</p></>}
+                    sx={{ color: '#000', display: 'flex', alignItems  : 'center', padding: 0.5 }}
                   />
                 ))}
                 <Box mt={2} display="flex" flexDirection="column" gap={1}>
@@ -254,19 +306,25 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
                 </Box>
               </>
             )}
-          </Box>
+          </Box>}
         </Box>
       ) : (
         <DndProvider backend={HTML5Backend}>
           <Box display="flex" flexWrap="wrap">
-            {applied.map((fn, i) => <DraggableFn fn={fn} idx={i} key={i} />)}
+            {applied.map((fn, i) => <DraggableFn fn={fn} idx={i} key={i}  />)}
           </Box>
         </DndProvider>
       )}
-
+        <ToastNotification
+          open={toastOpen}
+          type={'success'}
+          message={'Column functions added'}
+          onClose={() => setToastOpen(false)}
+        />
       <Box display="flex" justifyContent="flex-end" mt={3}>
         <Button onClick={onClose}>Cancel</Button>
         <Button variant="contained" onClick={handleDone}>Done</Button>
+      </Box>
       </Box>
     </Box>
   );
