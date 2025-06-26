@@ -49,6 +49,7 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
   const [sortOrder, setSortOrder] = useState('')
   const [toastOpen, setToastOpen] = useState(false)
   const [notification, setNotification] = useState(false)
+  const [selectAllColumns, setSelectAllColumns] = useState(false)
 
   const FUNCTION_CONFIG = {
     text: [
@@ -230,7 +231,7 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
       {tab < 4 ? (
         <Box display="flex" gap={2}   minHeight={300} maxHeight={300}  sx={{overflowY : 'scroll'}}>
           <Box flex={1}>
-            <Typography variant="subtitle2" sx={{ mb:1, fontWeight: 'bold', fontSize: 16 }}>Select Column</Typography>
+            {displayCols.length !== 0 && <Typography variant="subtitle2" sx={{ mb:1, fontWeight: 'bold', fontSize: 16 }}>Select Column</Typography>}
             {displayCols.length ? (
               <Grid container spacing={1}>
                 {displayCols.map(col => (
@@ -255,7 +256,9 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
                 ))}
               </Grid>
             ) : (
-              <Typography color="text.secondary" sx={{ mt:2 }}>No columns available.</Typography>
+               <Box sx={{ display: 'flex', justifyContent:'center', alignItems: 'center'}} height={'100%'}>
+                <Typography  sx={{ mt:2 }}>No columns available.</Typography>
+                </Box>
             )}
           </Box>
 
@@ -327,10 +330,23 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
           message={'Column functions added'}
           onClose={() => setToastOpen(false)}
         />
-      <Box display="flex" justifyContent="flex-end" mt={3} sx={{}}>
+        <Box display={'flex'} alignItems={ 'center'} justifyContent={tab !== 4 ? 'space-between' : 'flex-end'}>
+          {tab !== 4 && <><Box>
+            {/* <Typography>Select All</Typography> */}
+            <FormControlLabel
+                    key={1}
+                    control={<Checkbox size="small"  checked={selectAllColumns} onChange={()=> setSelectAllColumns(!selectAllColumns)} />}
+                    label={<><p style={{ margin: 0, padding: 0, }}>Select All</p></>}
+                    sx={{ color: '#000', display: 'flex', alignItems  : 'center', padding: 0.5 }}
+                  />
+          </Box>
+          <Typography>{selectedCols?.size  || 0} Selected</Typography></>}
+      <Box display="flex" justifyContent="flex-end"  sx={{}}>
         <Button onClick={onClose} sx={{backgroundColor:'#ffffff', color:'#0014BF', textTransform: 'none', fontWeight:'bold', border: '1px solid #0014BF', marginRight: 2}}>Cancel</Button>
         <Button variant="contained" onClick={handleDone} sx={{backgroundColor:'#0014BF',textTransform: 'none', color:'#ffffff', fontWeight:'bold'}}>Done</Button>
       </Box>
+      </Box>
+
       </Box>
     </Box>
   );

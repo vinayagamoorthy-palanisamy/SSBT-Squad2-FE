@@ -245,14 +245,14 @@ export default function DatasetDefinition() {
             <Box display="flex" gap={2}>
               <Button  sx={{color:'#0014BF', fontWeight: 'bold', backgroundColor: '#F0F2F5'}}
                onClick={handleAddColumns}  startIcon={<AddCircleOutlineIcon />}>Add Columns</Button>
-              <Button  onClick={handleAddFunctions}  sx={{backgroundColor: '#F0F2F5', color:'#0014BF', fontWeight: 'bold'}} startIcon={<AddCircleOutlineIcon />}>Add Functions</Button>
-              <Button  onClick={()=>setIsSidebarOpen(b=>!b)}  sx={{backgroundColor: '#F0F2F5', color:'#0014BF', fontWeight: 'bold'}} startIcon={<ListAltIcon />}>List View</Button>
+              <Button disabled={!columns.length} onClick={handleAddFunctions}  sx={{backgroundColor: '#F0F2F5', color:'#0014BF', fontWeight: 'bold'}} startIcon={<AddCircleOutlineIcon />}>Add Functions</Button>
+              <Button disabled={!columns.length} onClick={()=>setIsSidebarOpen(b=>!b)}  sx={{backgroundColor: '#F0F2F5', color:'#0014BF', fontWeight: 'bold'}} startIcon={<ListAltIcon />}>List View</Button>
             </Box>
           </Box>
           <Box sx={{ p:3 }}>
-          <TextField fullWidth size="small" placeholder="Search column" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} sx={{ mb:2 }} />
+          {columns.length > 0 && <TextField fullWidth size="small" placeholder="Search column" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} sx={{ mb:2 }} />}
 
-          <Grid container spacing={1}>
+          <Box minHeight={300} maxHeight={300} display={'flex'} alignItems={!filteredColumns.length ? 'center' : 'flex-start'} justifyContent={!filteredColumns.length ? 'center' : 'flex-start'}>{filteredColumns.length ? <Grid container spacing={1}>
             {filteredColumns.map((col,i)=>(
               <Grid item xs={6} sm={4} md={3} key={col}>
                 <DraggableChip
@@ -266,7 +266,14 @@ export default function DatasetDefinition() {
                 />
               </Grid>
             ))}
-          </Grid>
+          </Grid> : 
+          <Box >
+            <Typography >There are no columns selected. Add columns to view them here.</Typography>
+          </Box>
+          }
+          </Box>
+          
+          
 
           <DatasetListView isSidebarOpen={isSidebarOpen} toggleSidebar={()=>setIsSidebarOpen(o=>!o)}/>
             </Box>

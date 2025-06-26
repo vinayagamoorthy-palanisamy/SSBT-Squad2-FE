@@ -130,7 +130,9 @@ export const DatasetAddColumns = ({ onClose, onApply }) => {
                 <MenuItem value="desc">Sort Z - A</MenuItem>
               </Select>
             </FormControl>
+        
           </Box>
+              
           <TextField
             label="Search column"
             variant="outlined"
@@ -140,6 +142,7 @@ export const DatasetAddColumns = ({ onClose, onApply }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
             sx={{ mb: 2 }}
           />
+          <Typography>Click to select column. Hold shift key to select a range of columns.</Typography>
           <Grid container spacing={1}>
             {filteredColumns.map((column, index) => (
               <Grid item xs={6} sm={4} md={3} key={column}>
