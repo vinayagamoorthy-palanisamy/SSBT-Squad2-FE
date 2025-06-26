@@ -61,15 +61,14 @@ const DraggableChip = ({
       onKeyDown={(e) => e.key === 'Enter' && handleClick(e)}
       sx={{
         cursor: 'grab',
-        backgroundColor: selectedColumns.has(column) ? '#1976d2' : 'white',
-        color: selectedColumns.has(column) ? 'white' : 'black',
-        transition: 'background-color 0.3s',
-        '&:hover': {
-          backgroundColor: selectedColumns.has(column) ? '#1565c0' : '#f0f0f0',
-        },
-        width: '100%',
+        border: '1px solid',
+        borderColor: selectedColumns.has(column) ? '#0014BF' : 'rgba(0, 0, 0, 0.23)',
+        backgroundColor: selectedColumns.has(column) ? 'rgba(25,118,210,0.1)' : '#fff',
+        color: selectedColumns.has(column) ? '#0014BF' : '#000',
+        width: 250,
         textAlign: 'center',
-        padding: '8px',
+        px: 2,
+        mb: 1,
         opacity: isDragging ? 0.5 : 1,
       }}
     />
@@ -119,10 +118,18 @@ export const DatasetAddColumns = ({ onClose, onApply }) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Container maxWidth="lg" sx={{ mt: 4, pb: 10 }}>
-        <Paper elevation={3} sx={{ p: 3 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6">Add Columns</Typography>
+        <Box sx={{ backgroundColor:'#F0F2F5'}}>
+          <Box display="flex" gap={2} mb={2} sx={{paddingLeft:3, paddingRight: 3, paddingTop: 2, paddingBottom: 0}}>
+            {/* <Typography variant="h6">Add Columns</Typography> */}
+            <TextField
+            label="Search column"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ mb: 2 }}
+          />
             <FormControl size="small">
               <InputLabel>Sort</InputLabel>
               <Select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} label="Sort">
@@ -133,19 +140,15 @@ export const DatasetAddColumns = ({ onClose, onApply }) => {
         
           </Box>
               
-          <TextField
-            label="Search column"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Typography>Click to select column. Hold shift key to select a range of columns.</Typography>
+          
+          <Typography sx={{paddingLeft: 3}}>Click to select column. Hold shift key to select a range of columns.</Typography>
+
+          <Box sx={{backgroundColor:'#ffffff', p:3}}>
+            <Box display="flex" gap={2}   minHeight={300} maxHeight={300}  sx={{overflowY : 'scroll'}}>
+              <Box flex={1}>
           <Grid container spacing={1}>
             {filteredColumns.map((column, index) => (
-              <Grid item xs={6} sm={4} md={3} key={column}>
+              <Grid item xs={6} key={column}>
                 <DraggableChip
                   column={column}
                   index={index}
@@ -159,18 +162,16 @@ export const DatasetAddColumns = ({ onClose, onApply }) => {
               </Grid>
             ))}
           </Grid>
-        </Paper>
+          </Box>
+          </Box>
         <Box
-          position="fixed"
-          bottom={0}
-          left={0}
-          width="90%"
+          width="100%"
           bgcolor="white"
           borderTop="1px solid #ddd"
-          p={2}
           display="flex"
           justifyContent="space-between"
           alignItems="center"
+          pt={1}
         >
           <FormControlLabel
             control={
@@ -189,18 +190,19 @@ export const DatasetAddColumns = ({ onClose, onApply }) => {
           />
           <Typography sx={{ fontWeight: 'bold' }}>{selectedColumns.size} Columns Selected</Typography>
           <Box display="flex" gap={2}>
-            <Button variant="outlined" onClick={onClose}>Cancel</Button>
+            <Button variant="outlined" onClick={onClose} sx={{backgroundColor:'#ffffff', color:'#0014BF', textTransform: 'none', fontWeight:'bold', border: '1px solid #0014BF'}}>Cancel</Button>
             <Button
               variant="contained"
-              startIcon={<AddCircleOutlineIcon />}
               onClick={handleAddColumns}
               disabled={selectedColumns.size === 0}
+              sx={{backgroundColor:'#0014BF',textTransform: 'none', color:'#ffffff', fontWeight:'bold'}}
             >
               Add Columns
             </Button>
           </Box>
+          </Box>
         </Box>
-      </Container>
+        </Box>
     </DndProvider>
   );
 };

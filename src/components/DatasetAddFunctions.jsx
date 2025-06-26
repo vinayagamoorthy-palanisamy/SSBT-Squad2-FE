@@ -330,17 +330,17 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
           message={'Column functions added'}
           onClose={() => setToastOpen(false)}
         />
-        <Box display={'flex'} alignItems={ 'center'} justifyContent={tab !== 4 ? 'space-between' : 'flex-end'}>
+        <Box display={'flex'} alignItems={ 'center'} justifyContent={tab !== 4 ? 'space-between' : 'flex-end'} borderTop="1px solid #ddd" pt={2}>
           {tab !== 4 && <><Box>
             {/* <Typography>Select All</Typography> */}
             <FormControlLabel
                     key={1}
                     control={<Checkbox size="small"  checked={selectAllColumns} onChange={()=> setSelectAllColumns(!selectAllColumns)} />}
-                    label={<><p style={{ margin: 0, padding: 0, }}>Select All</p></>}
+                    label={<><p style={{ margin: 0, padding: 0, fontWeight: 'bold', fontSize: '1rem' }}>Select All</p></>}
                     sx={{ color: '#000', display: 'flex', alignItems  : 'center', padding: 0.5 }}
                   />
           </Box>
-          <Typography>{selectedCols?.size  || 0} Selected</Typography></>}
+          <Typography sx={{ fontWeight: 'bold'}}>{selectedCols?.size  || 0} Selected</Typography></>}
       <Box display="flex" justifyContent="flex-end"  sx={{}}>
         <Button onClick={onClose} sx={{backgroundColor:'#ffffff', color:'#0014BF', textTransform: 'none', fontWeight:'bold', border: '1px solid #0014BF', marginRight: 2}}>Cancel</Button>
         <Button variant="contained" onClick={handleDone} sx={{backgroundColor:'#0014BF',textTransform: 'none', color:'#ffffff', fontWeight:'bold'}}>Done</Button>

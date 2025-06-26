@@ -165,6 +165,9 @@ export default function DatasetDefinition() {
           onApply={cols => { setSubmittedColumns(cols); handleCloseModal(); }}
         />
       ),
+       title: 'Add Columns',
+      fullWidth: true,
+      maxWidth: 'lg',
       customStyle: { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width:920, bgcolor:'background.paper', boxShadow:24, p:4 }
     });
   };
