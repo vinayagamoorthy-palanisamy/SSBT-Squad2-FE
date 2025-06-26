@@ -204,16 +204,16 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
       </Box>
 
       <Box sx={{backgroundColor:'#ffffff', p:3}}>
-      <Box display="flex" alignItems="center" mb={2}>
-        <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ flex: 1 }}>
+      <Box display="flex" alignItems="center" mb={2} sx={{borderBottom: 1, borderColor: 'divider'}}>
+        <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ flex: 1 }} >
           {tabLabels.map((label, i) => (
             <Tab
               key={i}
               label={
-                <Box display="flex" alignItems="center">
-                  <Typography fontWeight="bold">{label}</Typography>
+                <Box display="flex" alignItems="center" >
+                  <Typography fontWeight="bold" sx={{textTransform: 'none'}}>{label}</Typography>
                   {i === 4 && notification && (
-                    <CircleIcon sx={{ fontSize: 10, color: 'red', marginLeft: 1 }} />
+                    <CircleIcon sx={{ fontSize: 10, color: '#BF1D1D', marginLeft: 1 }} />
                   )}
                 </Box>
               }
@@ -228,7 +228,7 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
       </Box>
 
       {tab < 4 ? (
-        <Box display="flex" gap={2}>
+        <Box display="flex" gap={2}   minHeight={300} maxHeight={300}  sx={{overflowY : 'scroll'}}>
           <Box flex={1}>
             <Typography variant="subtitle2" sx={{ mb:1, fontWeight: 'bold', fontSize: 16 }}>Select Column</Typography>
             {displayCols.length ? (
@@ -244,9 +244,9 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
                         width: 250,
                         textAlign: 'center',
                         border: '1px solid',
-                        borderColor: selectedCols.has(col) ? '#1976d2' : 'rgba(0, 0, 0, 0.23)',
+                        borderColor: selectedCols.has(col) ? '#0014BF' : 'rgba(0, 0, 0, 0.23)',
                         backgroundColor: selectedCols.has(col) ? 'rgba(25,118,210,0.1)' : '#fff',
-                        color: selectedCols.has(col) ? '#1976d2' : '#000',
+                        color: selectedCols.has(col) ? '#0014BF' : '#000',
                         px: 2,
                         mb: 1
                       }}
@@ -302,18 +302,24 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
                 ))}
                 <Box mt={2} display="flex" flexDirection="column" gap={1}>
                   <TextField size="small" placeholder="Show As" value={aliasText} onChange={e => setAliasText(e.target.value)} />
-                  <Button variant="contained" size="small" onClick={applyFunction} disabled={selectedCols.size === 0 || selectedFuncs.size === 0}>Apply Function</Button>
+                  <Button sx={{ color:'#0014BF', fontWeight:'bold', border: '1px solid #0014BF', width: 150, textTransform: 'none'}} size="small" onClick={applyFunction} disabled={selectedCols.size === 0 || selectedFuncs.size === 0}>Apply Function</Button>
                 </Box>
               </>
             )}
           </Box>}
         </Box>
       ) : (
+      applied.length > 0 ?
+      <Box  minHeight={300} maxHeight={300}  sx={{overflowY : 'scroll'}}>
         <DndProvider backend={HTML5Backend}>
           <Box display="flex" flexWrap="wrap">
             {applied.map((fn, i) => <DraggableFn fn={fn} idx={i} key={i}  />)}
           </Box>
-        </DndProvider>
+        </DndProvider> 
+        </Box>: 
+        <Box   minHeight={300} maxHeight={300}  sx={{overflowY : 'scroll'}} sx={{display: 'flex', justifyContent:'center', alignItems: 'center'}}>
+          <Typography>When you have applied functions, they will appear here.</Typography>
+        </Box>
       )}
         <ToastNotification
           open={toastOpen}
@@ -321,9 +327,9 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
           message={'Column functions added'}
           onClose={() => setToastOpen(false)}
         />
-      <Box display="flex" justifyContent="flex-end" mt={3}>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleDone}>Done</Button>
+      <Box display="flex" justifyContent="flex-end" mt={3} sx={{}}>
+        <Button onClick={onClose} sx={{backgroundColor:'#ffffff', color:'#0014BF', textTransform: 'none', fontWeight:'bold', border: '1px solid #0014BF', marginRight: 2}}>Cancel</Button>
+        <Button variant="contained" onClick={handleDone} sx={{backgroundColor:'#0014BF',textTransform: 'none', color:'#ffffff', fontWeight:'bold'}}>Done</Button>
       </Box>
       </Box>
     </Box>
