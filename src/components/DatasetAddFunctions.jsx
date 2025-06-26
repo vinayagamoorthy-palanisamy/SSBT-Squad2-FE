@@ -317,7 +317,7 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
           </Box>
         </DndProvider> 
         </Box>: 
-        <Box   minHeight={300} maxHeight={300}  sx={{overflowY : 'scroll'}} sx={{display: 'flex', justifyContent:'center', alignItems: 'center'}}>
+        <Box   minHeight={300} maxHeight={300} sx={{overflowY : 'scroll', display: 'flex', justifyContent:'center', alignItems: 'center'}}>
           <Typography>When you have applied functions, they will appear here.</Typography>
         </Box>
       )}
