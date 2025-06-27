@@ -46,7 +46,7 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
   const [aliasText, setAliasText] = useState('');
   const [codeText, setCodeText] = useState('');
   const [applied, setApplied] = useState([]);
-  const [sortOrder, setSortOrder] = useState('')
+  const [sortOrder, setSortOrder] = useState('asc')
   const [toastOpen, setToastOpen] = useState(false)
   const [notification, setNotification] = useState(false)
   const [selectAllColumns, setSelectAllColumns] = useState(false)
@@ -179,6 +179,12 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
       </div>
     );
   };
+
+    const handleSelectAllChange = (e) => {
+    const updated = new Set(selectedCols);
+    displayCols.forEach(col => e.target.checked ? updated.add(col) : updated.delete(col));
+    setSelectedCols(updated);
+  };
   
   return (
     <Box sx={{ backgroundColor:'#F0F2F5'}}>
@@ -196,7 +202,11 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
         <Box display="flex" flexDirection="column" alignItems="flex-end">
           <FormControl size="small" sx={{width: 120}}>
               <InputLabel>Sort</InputLabel>
-              <Select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} label="Sort">
+              <Select value={sortOrder} onChange={(e) => {
+                setSortOrder(e.target.value)
+                setSortAsc(e.target.value === 'asc' ? true : false)
+              }} 
+              label="Sort">
                 <MenuItem value="asc">Sort A - Z</MenuItem>
                 <MenuItem value="desc">Sort Z - A</MenuItem>
               </Select>
@@ -276,7 +286,7 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
                   value={codeText}
                   onChange={e => setCodeText(e.target.value)}
                 />
-                <Button variant="contained" size="small" sx={{ mt:1 }} onClick={applyFunction} disabled={!codeText.trim()}>Apply Function</Button>
+                <Button size="small" sx={{mt:2, mb:2, color:'#0014BF', fontWeight:'bold', border: '1px solid #0014BF', width: 150, textTransform: 'none'}} onClick={applyFunction} disabled={!codeText.trim()}>Apply Function</Button>
               </>
             ) : (
               <>
@@ -335,15 +345,20 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
             {/* <Typography>Select All</Typography> */}
             <FormControlLabel
                     key={1}
-                    control={<Checkbox size="small"  checked={selectAllColumns} onChange={()=> setSelectAllColumns(!selectAllColumns)} />}
-                    label={<><p style={{ margin: 0, padding: 0, fontWeight: 'bold', fontSize: '1rem' }}>Select All</p></>}
+                    control={
+                    <Checkbox size="small"  
+                    // checked={selectAllColumns} 
+                    checked={displayCols?.length > 0 && displayCols?.every((col) => selectedCols.has(col)) }
+                    indeterminate={selectedCols.size > 0 && selectedCols.size < displayCols.length}
+                    onChange={handleSelectAllChange} />}
+                    label={<p style={{ margin: 0, padding: 0, fontWeight: 'bold', fontSize: '1rem' }}>Select All</p>}
                     sx={{ color: '#000', display: 'flex', alignItems  : 'center', padding: 0.5 }}
                   />
           </Box>
           <Typography sx={{ fontWeight: 'bold'}}>{selectedCols?.size  || 0} Selected</Typography></>}
       <Box display="flex" justifyContent="flex-end"  sx={{}}>
         <Button onClick={onClose} sx={{backgroundColor:'#ffffff', color:'#0014BF', textTransform: 'none', fontWeight:'bold', border: '1px solid #0014BF', marginRight: 2}}>Cancel</Button>
-        <Button variant="contained" onClick={handleDone} sx={{backgroundColor:'#0014BF',textTransform: 'none', color:'#ffffff', fontWeight:'bold'}}>Done</Button>
+        <Button disabled={!applied.length > 0} variant="contained" onClick={handleDone} sx={{backgroundColor:'#0014BF',textTransform: 'none', color:'#ffffff', fontWeight:'bold'}}>Done</Button>
       </Box>
       </Box>
 

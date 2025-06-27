@@ -130,14 +130,15 @@ export const DatasetAddColumns = ({ onClose, onApply }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
             sx={{ mb: 2 }}
           />
-            <FormControl size="small">
+          <Box display="flex" flexDirection="column" alignItems="flex-end">
+            <FormControl size="small" sx={{width: 120}}>
               <InputLabel>Sort</InputLabel>
               <Select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} label="Sort">
                 <MenuItem value="asc">Sort A - Z</MenuItem>
                 <MenuItem value="desc">Sort Z - A</MenuItem>
               </Select>
             </FormControl>
-        
+        </Box>
           </Box>
               
           
