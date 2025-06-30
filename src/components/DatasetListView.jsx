@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   Drawer, Button, List, Typography, Box,
   Divider, Stack, Paper, IconButton
@@ -11,25 +11,31 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 const ItemType = { COLUMN: 'COLUMN' };
 
 const DraggableListItem = ({
-  item, index, moveItem, handleDelete,
-  isSelected, handleItemClick
+  item, moveItems, handleDelete,
+  isSelected, handleItemClick, selectedItems
 }) => {
   const ref = useRef(null);
+
+  const [{ isDragging }, drag] = useDrag({
+    type: ItemType.COLUMN,
+    item: {
+      item,
+      items: selectedItems.includes(item)
+        ? selectedItems
+        : [item]
+    },
+    collect: monitor => ({
+      isDragging: monitor.isDragging()
+    })
+  });
 
   const [, drop] = useDrop({
     accept: ItemType.COLUMN,
     hover(dragged) {
-      if (dragged.index !== index) {
-        moveItem(dragged.index, index);
-        dragged.index = index;
-      }
+      if (dragged.item === item) return;
+      moveItems(dragged.items, item);
+      dragged.item = item;
     }
-  });
-
-  const [{ isDragging }, drag] = useDrag({
-    type: ItemType.COLUMN,
-    item: { index },
-    collect: (monitor) => ({ isDragging: monitor.isDragging() })
   });
 
   drag(drop(ref));
@@ -37,12 +43,14 @@ const DraggableListItem = ({
   return (
     <Paper
       ref={ref}
-      onClick={(e) => handleItemClick(e, index)}
+      onClick={(e) => handleItemClick(e, item)}
       variant="outlined"
       sx={{
-        display: 'flex', alignItems: 'center',
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 1, marginBottom: 1,
+        padding: 1,
+        marginBottom: 1,
         cursor: 'pointer',
         opacity: isDragging ? 0.5 : 1,
         backgroundColor: isSelected ? '#e0f3ff' : '#fafafa',
@@ -51,9 +59,17 @@ const DraggableListItem = ({
     >
       <Stack direction="row" alignItems="center" spacing={1}>
         <DragIndicatorIcon fontSize="small" color="action" />
-        <Typography>{item}</Typography>
+        <Typography sx={{ fontWeight: isSelected ? 'bold' : 'normal' }}>
+          {item}
+        </Typography>
       </Stack>
-      <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleDelete(index); }}>
+      <IconButton
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDelete(item);
+        }}
+      >
         <CloseIcon fontSize="small" />
       </IconButton>
     </Paper>
@@ -61,57 +77,65 @@ const DraggableListItem = ({
 };
 
 const DatasetListView = ({
-  setSubmittedColumns, isSidebarOpen, toggleSidebar
+  setSubmittedColumns,
+  isSidebarOpen,
+  toggleSidebar,
+  columns
 }) => {
-  const [items, setItems] = useState([
-    'Column_4', 'Column_7', 'Column_9', 'Column_10',
-    'Column_11', 'Column_15', 'Column_5', 'Column_6',
-    'Column_8', 'Column_12', 'Column_13', 'Column_14', 'Column_16'
-  ]);
-
+  const [items, setItems] = useState([]);
   const [selected, setSelected] = useState([]);
   const lastClick = useRef(null);
 
-  const moveItem = useCallback((from, to) => {
-    setItems((prev) => {
-      const arr = [...prev];
-      const [moved] = arr.splice(from, 1);
-      arr.splice(to, 0, moved);
-      return arr;
+  useEffect(() => {
+    setItems(columns);
+    setSelected([]);
+  }, [columns]);
+
+  const moveItems = useCallback((draggedItems, targetItem) => {
+    setItems(prev => {
+      const filtered = prev.filter(i => !draggedItems.includes(i));
+      const dropIndex = filtered.indexOf(targetItem);
+      filtered.splice(dropIndex, 0, ...draggedItems);
+      return filtered;
     });
-    setSelected((prev) => {
-      if (!prev.includes(from)) return prev;
-      return prev.map((i) => {
-        if (i === from) return to;
-        if (from < to && i > from && i <= to) return i - 1;
-        if (from > to && i < from && i >= to) return i + 1;
-        return i;
-      }).sort((a, b) => a - b);
-    });
+
+    setSelected(draggedItems); // keep selection after drop
   }, []);
 
-  const handleDelete = (idx) => {
-    setItems((prev) => prev.filter((_, i) => i !== idx));
-    setSelected((prev) => prev.filter((i) => i !== idx));
+  const handleDelete = (item) => {
+    setItems(prev => prev.filter(i => i !== item));
+    setSelected(prev => prev.filter(i => i !== item));
   };
 
   const handleBulkDelete = () => {
-    setItems((prev) => prev.filter((_, i) => !selected.includes(i)));
+    const toDelete = new Set(selected);
+    setItems(prev => prev.filter(i => !toDelete.has(i)));
     setSelected([]);
   };
 
-  const handleItemClick = (e, idx) => {
+  const handleItemClick = (e, item) => {
+    const index = items.indexOf(item);
+
     if (e.shiftKey && lastClick.current != null) {
-      const start = Math.min(lastClick.current, idx);
-      const end = Math.max(lastClick.current, idx);
-      setSelected((prev) => [
-        ...new Set([...prev, ...Array.from({ length: end - start + 1 }, (_, i) => start + i)])
-      ]);
-    } else {
-      setSelected((prev) =>
-        prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
+      const lastIndex = items.indexOf(lastClick.current);
+      const [start, end] = [lastIndex, index].sort((a, b) => a - b);
+      const range = items.slice(start, end + 1);
+      setSelected(prev => [...new Set([...prev, ...range])]);
+    } else if (e.ctrlKey || e.metaKey) {
+      setSelected(prev =>
+        prev.includes(item)
+          ? prev.filter(i => i !== item)
+          : [...prev, item]
       );
-      lastClick.current = idx;
+      lastClick.current = item;
+    } else {
+      // Regular click — toggle item in/out
+      setSelected(prev =>
+        prev.includes(item)
+          ? prev.filter(i => i !== item)
+          : [...prev, item]
+      );
+      lastClick.current = item;
     }
   };
 
@@ -121,19 +145,19 @@ const DatasetListView = ({
         <Box sx={{ width: 300, p: 2 }}>
           <Typography variant="h6">Dataset Columns</Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            Select items then drag one to move it along with its selection style.
+            Click to select/deselect. Shift for range. Cmd/Ctrl for multi-toggle.
           </Typography>
           <Divider sx={{ my: 2 }} />
           <List disablePadding>
-            {items.map((it, idx) => (
+            {items.map((item) => (
               <DraggableListItem
-                key={it}
-                item={it}
-                index={idx}
-                moveItem={moveItem}
+                key={item}
+                item={item}
+                moveItems={moveItems}
                 handleDelete={handleDelete}
-                isSelected={selected.includes(idx)}
+                isSelected={selected.includes(item)}
                 handleItemClick={handleItemClick}
+                selectedItems={selected}
               />
             ))}
           </List>

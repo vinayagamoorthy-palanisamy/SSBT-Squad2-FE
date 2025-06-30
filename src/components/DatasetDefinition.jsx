@@ -51,19 +51,34 @@ const DraggableChip = ({
   setLastClickedIndex,
 }) => {
   const isSelected = selectedColumns.has(column);
+  
   const handleClick = (e) => {
-    const next = new Set(selectedColumns);
-    if (e.shiftKey && lastClickedIndex != null) {
-      const [a, b] = [lastClickedIndex, index].sort((x, y) => x - y);
-      for (let i = a; i <= b; i++) next.add(allColumns[i]);
-    } else if (e.ctrlKey || e.metaKey) {
-      next.has(column) ? next.delete(column) : next.add(column);
+  const next = new Set(selectedColumns);
+
+  if (e.shiftKey && lastClickedIndex != null) {
+    // Shift+Click: select range
+    const [start, end] = [lastClickedIndex, index].sort((a, b) => a - b);
+    for (let i = start; i <= end; i++) {
+      next.add(allColumns[i]);
+    }
+  } else if (e.ctrlKey || e.metaKey) {
+    // Ctrl/Cmd+Click: toggle individual
+    next.has(column) ? next.delete(column) : next.add(column);
+    setLastClickedIndex(index);
+  } else {
+    // Regular click: toggle selected if already selected, otherwise single select
+    if (next.has(column)) {
+      next.delete(column);
     } else {
       next.add(column);
     }
     setLastClickedIndex(index);
-    setSelectedColumns(next);
-  };
+  }
+
+  setSelectedColumns(next);
+};
+
+
 
   const [{ isDragging }, drag] = useDrag({
     type: 'COLUMN',
@@ -278,7 +293,7 @@ export default function DatasetDefinition() {
           
           
 
-          <DatasetListView isSidebarOpen={isSidebarOpen} toggleSidebar={()=>setIsSidebarOpen(o=>!o)}/>
+          <DatasetListView columns={columns} isSidebarOpen={isSidebarOpen} toggleSidebar={()=>setIsSidebarOpen(o=>!o)}/>
             </Box>
         </Paper>
 
