@@ -37,6 +37,7 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
   const dateColsRaw = columnsByType.date?.length ? columnsByType.date : textColsRaw;
   const boolColsRaw = columnsByType.boolean?.length ? columnsByType.boolean : textColsRaw;
 
+
   const [tab, setTab] = useState(0);
   const [searchText, setSearchText] = useState('');
   const [sortAsc, setSortAsc] = useState(true);
@@ -49,7 +50,10 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
   const [sortOrder, setSortOrder] = useState('asc')
   const [toastOpen, setToastOpen] = useState(false)
   const [notification, setNotification] = useState(false)
+  const [functionsError, setFunctionsError] = useState(false)
+  const [columnsError, setColumnsError] = useState(false)
   const [selectAllColumns, setSelectAllColumns] = useState(false)
+  const [applyError, setApplyError] = useState(false)
 
   const FUNCTION_CONFIG = {
     text: [
@@ -77,6 +81,7 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
   };
   const columnTypes = ['text', 'number', 'date', 'boolean'];
   const tabLabels = ['Text Columns', 'Number Columns', 'Date Columns', 'Boolean Columns', 'Applied Functions'];
+  const codeEditorFunctions = ['UPPER','LOWER','TRIM','LENGTH','SUM','AVG','MAX','MIN','COUNT']
 
   const displayCols = useMemo(() => {
     let list = [];
@@ -112,11 +117,36 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
 
   const applyFunction = () => {
     const newFns = [];
+    let error = false
     if (editorMode) {
-      codeText.split(';').forEach(expr => {
+
+      const splitCode = codeText.split(';')
+      const cleanedData = splitCode
+        .map(item => item.replace(/\n/g, ''))  // Remove newline characters
+        .filter(item => item.trim() !== '');   // Remove empty or whitespace-only strings
+
+      cleanedData?.forEach(expr => {
         const trimmed = expr.trim();
-        if (trimmed) newFns.push({ column: null, expression: trimmed });
+        const functionName = trimmed.match(/^([A-Z_]+)\s*\(/)?.[1] || '';
+        const getColumns = trimmed.match(/\(([^)]+)\)/);
+        const columnsArray = getColumns ? getColumns[1].split(',').map(s => s.trim()) : [];
+
+        if(!codeEditorFunctions.includes(functionName)){
+          setFunctionsError(true)
+          error = true
+        } else{
+        columnsArray.forEach(column => { 
+          if(!textColsRaw?.includes(column)){
+            setColumnsError(true)
+            error = true
+          }
+          else{
+            newFns.push({ column: column, expression: `${functionName}(${column})` }) 
+          } 
+          })
+        }
       });
+      
     } else {
       selectedCols.forEach(col => selectedFuncs.forEach(fn => {
         const expr = `${fn}(${col})${aliasText ? ` AS ${aliasText}` : ''}`;
@@ -124,6 +154,8 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
         if(!exists) newFns.push({ column: col, expression: expr });
       }));
     }
+  
+    if(!error){
     setApplied(prev => [...prev, ...newFns]);
     setToastOpen(true)
     setNotification(true)
@@ -131,9 +163,10 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
     setSelectedFuncs(new Set());
     setAliasText('');
     setCodeText('');
+    }
+    
     // setTab(4);
   };
-
 
   const moveFunction = useCallback((from, to) => {
     setApplied(prev => {
@@ -272,9 +305,9 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
             )}
           </Box>
 
-          {selectedCols.size !== 0 && <Box sx={{ width: 300 }}>
+          {<>
             {editorMode ? (
-              <>
+              <Box sx={{ width: 300 }}>
                 <Typography variant="subtitle1" sx={{ mb:1, color: '#000' }}>Function Code Editor</Typography>
                 <Typography variant="body2" sx={{ mb:1, color: '#000' }}>Apply any scalar or aggregate functions using this code editor. Use ';' to separate each function.</Typography>
                 <TextField
@@ -287,9 +320,9 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
                   onChange={e => setCodeText(e.target.value)}
                 />
                 <Button size="small" sx={{mt:2, mb:2, color:'#0014BF', fontWeight:'bold', border: '1px solid #0014BF', width: 150, textTransform: 'none'}} onClick={applyFunction} disabled={!codeText.trim()}>Apply Function</Button>
-              </>
-            ) : (
-              <>
+              </Box>
+            ) : selectedCols.size !== 0 &&
+                <Box sx={{ width: 300 }}>
                 <Typography variant="subtitle1" sx={{ mb:1, color: '#000', fontWeight: 'bold' }}>Select Functions</Typography>
 
                 {FUNCTION_CONFIG[columnTypes[tab]].filter(f => f.type === 'SCALAR').length > 0 && <Typography variant="subtitle1" sx={{ mb:1, color: '#000' , fontStyle: 'italic'}}>SCALAR</Typography>}
@@ -317,9 +350,9 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
                   <TextField size="small" placeholder="Show As" value={aliasText} onChange={e => setAliasText(e.target.value)} />
                   <Button sx={{ color:'#0014BF', fontWeight:'bold', border: '1px solid #0014BF', width: 150, textTransform: 'none'}} size="small" onClick={applyFunction} disabled={selectedCols.size === 0 || selectedFuncs.size === 0}>Apply Function</Button>
                 </Box>
-              </>
-            )}
-          </Box>}
+              </Box>
+            }
+          </>}
         </Box>
       ) : (
       applied.length > 0 ?
@@ -334,6 +367,18 @@ const DatasetAddFunctions = ({ onClose, columnsByType = {}, onApply }) => {
           <Typography>When you have applied functions, they will appear here.</Typography>
         </Box>
       )}
+       <ToastNotification
+          open={functionsError}
+          type={'error'}
+          message={'Function name is not exist'}
+          onClose={() => setFunctionsError(false)}
+        />
+        <ToastNotification
+          open={columnsError}
+          type={'error'}
+          message={'column name is not exist'}
+          onClose={() => setColumnsError(false)}
+        />
         <ToastNotification
           open={toastOpen}
           type={'success'}
