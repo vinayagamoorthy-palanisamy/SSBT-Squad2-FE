@@ -13,6 +13,7 @@ import CreateWorkflow from '../components/CreateWorkflow';
 import CreateExtractPage from '../components/CreateExtractPage';
 import CreateExtractCard from '../components/CreateExtractCard';
 import DatasetDefinition from '../components/DatasetDefinition';
+import WorkflowView from '../components/workflowView'
 //DefineCoreExtract
 const AppRoutes = () => {
   return (
@@ -28,6 +29,7 @@ const AppRoutes = () => {
         <Route path='/create-extract' element={<CreateExtractPage/>} />
         <Route path="/DatasetDefinition" element={<DatasetDefinition />} />
       {/* <Route path="/modal" element={<MyModal/>} /> */}
+      <Route path="/workflow-view" element={<WorkflowView />} />
     </Routes>
   );
 };
