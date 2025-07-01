@@ -238,13 +238,15 @@ export default function DatasetDefinition() {
         <Typography variant="h4" gutterBottom style={{ color: '#000000' }}>Define Dataset</Typography>
 
         <Paper sx={{ mb: 3, p: 3 }} elevation={3}>
-          <Accordion>
+          <Accordion >
             <AccordionSummary
+            
               expandIcon={<ExpandMoreIcon />}
               sx={{
                 flexDirection: 'row-reverse',
                 '& .MuiAccordionSummary-expandIconWrapper': {
                   marginLeft: 'auto',
+                  bgcolor: '#ffffff'
                 },
               }}
             >
@@ -254,7 +256,6 @@ export default function DatasetDefinition() {
               <Box display="flex" gap={2}>
                 <Button
                   style={{ color: '#0014BF', border: '1px solid #0014BF', fontWeight: 'bold' }}
-                  variant="contained"
                   startIcon={<RemoveRedEyeIcon />}
                   onClick={() => setParamPreviewOpen(true)}
                 >Preview</Button>
