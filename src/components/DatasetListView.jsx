@@ -1,52 +1,44 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
-  Drawer,
-  Button,
-  List,
-  Typography,
-  Box,
-  Divider,
-  Stack,
-  Paper,
-  IconButton,
+  Drawer, Button, List, Typography, Box,
+  Divider, Stack, Paper, IconButton
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-const ItemType = {
-  COLUMN: 'COLUMN',
-};
+const ItemType = { COLUMN: 'COLUMN' };
+
+const getKey = (item) =>
+  item.type === 'function' ? item.expression : item.name;
 
 const DraggableListItem = ({
-  item,
-  index,
-  moveMultipleItems,
-  handleDelete,
-  isSelected,
-  selectedIndices,
-  handleItemClick,
+  item, moveItems, handleDelete,
+  isSelected, handleItemClick, selectedItems
 }) => {
   const ref = useRef(null);
 
-  const [, drop] = useDrop({
-    accept: ItemType.COLUMN,
-    hover(draggedItem) {
-      const draggedIndices = draggedItem.selectedIndices;
-      if (!draggedIndices.includes(index)) {
-        moveMultipleItems(draggedIndices, index);
-        draggedItem.selectedIndices = draggedIndices.map((_, i) => index + i);
-      }
-    },
-  });
-
   const [{ isDragging }, drag] = useDrag({
     type: ItemType.COLUMN,
-    item: { type: ItemType.COLUMN, index, selectedIndices },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
+    item: {
+      item,
+      items: isSelected
+        ? selectedItems
+        : [getKey(item)]
+    },
+    collect: monitor => ({
+      isDragging: monitor.isDragging()
+    })
+  });
+
+  const [, drop] = useDrop({
+    accept: ItemType.COLUMN,
+    hover(dragged) {
+      if (getKey(dragged.item) === getKey(item)) return;
+      moveItems(dragged.items, getKey(item));
+      dragged.item = item;
+    }
   });
 
   drag(drop(ref));
@@ -54,7 +46,7 @@ const DraggableListItem = ({
   return (
     <Paper
       ref={ref}
-      onClick={(e) => handleItemClick(e, index)}
+      onClick={(e) => handleItemClick(e, getKey(item))}
       variant="outlined"
       sx={{
         display: 'flex',
@@ -65,14 +57,23 @@ const DraggableListItem = ({
         cursor: 'pointer',
         opacity: isDragging ? 0.5 : 1,
         backgroundColor: isSelected ? '#e0f3ff' : '#fafafa',
-        border: isSelected ? '2px solid #2196f3' : '1px solid #ddd',
+        border: isSelected ? '2px solid #2196f3' : (item.type === 'function' ? '1px solid #0F8048' : '1px solid #ddd'),
+        color: item.type === 'function' ? '#0F8048' : 'inherit'
       }}
     >
       <Stack direction="row" alignItems="center" spacing={1}>
         <DragIndicatorIcon fontSize="small" color="action" />
-        <Typography>{item}</Typography>
+        <Typography sx={{ fontWeight: isSelected ? 'bold' : 'normal' }}>
+          {item.type === 'function' ? item.expression : item.name}
+        </Typography>
       </Stack>
-      <IconButton size="small" onClick={() => handleDelete(index)}>
+      <IconButton
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDelete(getKey(item));
+        }}
+      >
         <CloseIcon fontSize="small" />
       </IconButton>
     </Paper>
@@ -80,124 +81,109 @@ const DraggableListItem = ({
 };
 
 const DatasetListView = ({
-  handleCloseModal,
-  setSubmittedColumns,
-  setIsSidebarOpen,
+  setItems,
   isSidebarOpen,
   toggleSidebar,
+  items
 }) => {
-  const [columnListItems, setColumnListItems] = useState([
-    'Column_4', 'Column_7', 'Column_9', 'Column_10',
-    'Column_11', 'Column_15', 'Column_5', 'Column_6',
-    'Column_8', 'Column_12', 'Column_13', 'Column_14', 'Column_16',
-  ]);
+  const [localItems, setLocalItems] = useState([]);
+  const [selected, setSelected] = useState([]); // array of key (expression or name)
+  const lastClick = useRef(null);
 
-  const [selectedIndices, setSelectedIndices] = useState([]);
-  const lastClickedIndex = useRef(null);
+  useEffect(() => {
+    setLocalItems(items);
+    setSelected([]);
+  }, [items]);
 
-  const moveMultipleItems = useCallback((fromIndices, toIndex) => {
-    const updatedList = [...columnListItems];
-    const itemsToMove = fromIndices.map(i => updatedList[i]);
-    const remainingItems = updatedList.filter((_, i) => !fromIndices.includes(i));
+  const moveItems = useCallback((draggedKeys, targetKey) => {
+    setLocalItems(prev => {
+      const moving = prev.filter(i => draggedKeys.includes(getKey(i)));
+      const rest = prev.filter(i => !draggedKeys.includes(getKey(i)));
+      const dropIndex = rest.findIndex(i => getKey(i) === targetKey);
+      rest.splice(dropIndex, 0, ...moving);
+      return rest;
+    });
+    setSelected(draggedKeys);
+  }, []);
 
-    const insertIndex = toIndex > Math.max(...fromIndices)
-      ? toIndex - fromIndices.filter(i => i < toIndex).length
-      : toIndex;
-
-    remainingItems.splice(insertIndex, 0, ...itemsToMove);
-    setColumnListItems(remainingItems);
-
-    const newSelectedIndices = itemsToMove.map((_, i) => insertIndex + i);
-    setSelectedIndices(newSelectedIndices);
-  }, [columnListItems]);
-
-  const handleDelete = (index) => {
-    const updatedList = [...columnListItems];
-    updatedList.splice(index, 1);
-    setColumnListItems(updatedList);
-    setSelectedIndices((prev) => prev.filter((i) => i !== index));
+  const handleDelete = (itemKey) => {
+    setLocalItems(prev => prev.filter(i => getKey(i) !== itemKey));
+    setSelected(prev => prev.filter(n => n !== itemKey));
   };
 
   const handleBulkDelete = () => {
-    const updatedList = columnListItems.filter((_, i) => !selectedIndices.includes(i));
-    setColumnListItems(updatedList);
-    setSelectedIndices([]);
+    const toDelete = new Set(selected);
+    setLocalItems(prev => prev.filter(i => !toDelete.has(getKey(i))));
+    setSelected([]);
   };
 
-  const handleItemClick = (event, index) => {
-    if (event.shiftKey && lastClickedIndex.current !== null) {
-      // Shift+Click: add range to selection
-      const rangeStart = Math.min(lastClickedIndex.current, index);
-      const rangeEnd = Math.max(lastClickedIndex.current, index);
-      const range = Array.from({ length: rangeEnd - rangeStart + 1 }, (_, i) => i + rangeStart);
-      setSelectedIndices((prev) => Array.from(new Set([...prev, ...range])));
-    } else {
-      // Normal click: toggle selected state
-      setSelectedIndices((prev) =>
-        prev.includes(index)
-          ? prev.filter((i) => i !== index)
-          : [...prev, index]
+  const handleItemClick = (e, itemKey) => {
+    const index = localItems.findIndex(i => getKey(i) === itemKey);
+
+    if (e.shiftKey && lastClick.current != null) {
+      const lastIndex = localItems.findIndex(i => getKey(i) === lastClick.current);
+      const [start, end] = [lastIndex, index].sort((a, b) => a - b);
+      const range = localItems.slice(start, end + 1).map(getKey);
+      setSelected(prev => [...new Set([...prev, ...range])]);
+    } else if (e.ctrlKey || e.metaKey) {
+      setSelected(prev =>
+        prev.includes(itemKey)
+          ? prev.filter(n => n !== itemKey)
+          : [...prev, itemKey]
       );
-      lastClickedIndex.current = index;
+      lastClick.current = itemKey;
+    } else {
+      setSelected(prev =>
+        prev.includes(itemKey)
+          ? prev.filter(n => n !== itemKey)
+          : [...prev, itemKey]
+      );
+      lastClick.current = itemKey;
     }
   };
 
   return (
     <DndProvider backend={HTML5Backend}>
       <Drawer anchor="right" open={isSidebarOpen} onClose={toggleSidebar}>
-        <Box sx={{ width: 300, padding: 2 }}>
-          <Typography variant="h6">Dataset Columns</Typography>
+        <Box sx={{ width: 300, p: 2 }}>
+          <Typography variant="h6">Dataset Columns & Functions</Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            Click to select/unselect. Use Shift + Click to select a range.
+            Click to select/deselect. Shift for range. Cmd/Ctrl for multi-toggle.
           </Typography>
-
           <Divider sx={{ my: 2 }} />
-
           <List disablePadding>
-            {columnListItems.map((item, index) => (
+            {localItems.map((item) => (
               <DraggableListItem
-                key={item}
-                index={index}
+                key={getKey(item)}
                 item={item}
-                moveMultipleItems={moveMultipleItems}
+                moveItems={moveItems}
                 handleDelete={handleDelete}
-                isSelected={selectedIndices.includes(index)}
-                selectedIndices={selectedIndices}
+                isSelected={selected.includes(getKey(item))}
                 handleItemClick={handleItemClick}
+                selectedItems={selected}
               />
             ))}
           </List>
-
           <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="body2">{selectedIndices.length} selected</Typography>
+            <Typography variant="body2">{selected.length} selected</Typography>
             <Button
-              variant="text"
               color="error"
+              variant="text"
               onClick={handleBulkDelete}
-              disabled={selectedIndices.length === 0}
+              disabled={!selected.length}
             >
               Delete Selected
             </Button>
           </Box>
-
           <Box mt={3} display="flex" justifyContent="flex-end" gap={1}>
             <Button variant="outlined" onClick={toggleSidebar}>
               Cancel
             </Button>
             <Button
               variant="contained"
-              color="success"
               onClick={() => {
-                if (setSubmittedColumns) {
-                  setSubmittedColumns(columnListItems);
-                }
+                setItems(localItems); // this now stores full array (columns+functions+order)
                 toggleSidebar();
-              }}
-              sx={{
-                backgroundColor: '#0033cc',
-                '&:hover': {
-                  backgroundColor: '#002bb8',
-                },
               }}
             >
               Save

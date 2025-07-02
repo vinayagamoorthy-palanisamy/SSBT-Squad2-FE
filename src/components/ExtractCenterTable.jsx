@@ -13,9 +13,10 @@ import { MaterialReactTable } from "material-react-table";
 import { useExtractCenterTable } from "../hooks/useExtractCenterTable";
 import useExtractCenterDataStore from "../store/useExtractCenterTable";
 import MyAutocomplete from "./MyAutocomplete";
-import VersionHistoryModal from './VersionHistoryModal';
-import mockVersionData from '../assets/mockData/versionHistory';
+import VersionHistoryModal from "./VersionHistoryModal";
+import mockVersionData from "../assets/mockData/versionHistory";
 import ExtractOverflowButtons from "./ExtractOverflowButtons";
+import WorkflowView from "./workflowView";
 
 const theme = createTheme({
   palette: {
@@ -60,7 +61,7 @@ const ExtractCenterTable = () => {
     useExtractCenterDataStore((state) => state);
   const [tab, setTab] = useState("extract");
   const [versionModalOpen, setVersionModalOpen] = useState(false);
-  const [selectedExtractName, setSelectedExtractName] = useState('');
+  const [selectedExtractName, setSelectedExtractName] = useState("");
   const [selectedVersions, setSelectedVersions] = useState([]);
   const [clientOptions, setClientOptions] = useState([]);
   const [dataServiceOptions, setDataServiceOptions] = useState([]);
@@ -71,12 +72,12 @@ const ExtractCenterTable = () => {
     if (extractCenterData?.tableData?.length) {
       const clients = new Set();
       const dataServices = new Set();
-  
-      extractCenterData.tableData.forEach(item => {
+
+      extractCenterData.tableData.forEach((item) => {
         if (item.client) clients.add(item.client);
         if (item.dataService) dataServices.add(item.dataService);
       });
-  
+
       setClientOptions(["All", ...Array.from(clients)]);
       console.log('extractCenterData',extractCenterData)
       setDataServiceOptions(["All", ...Array.from(dataServices)]);
@@ -136,35 +137,49 @@ const ExtractCenterTable = () => {
             flexWrap: "wrap",
           }}
         >
-          <MyAutocomplete label="Client Name" options={clientOptions} value={selectedClient} onChange={handleChangeClient} />
-          <MyAutocomplete label="Data Service" options={dataServiceOptions} value={selectedDataService} onChange={handleChangeDataService} />
+          <MyAutocomplete
+            label="Client Name"
+            options={clientOptions}
+            value={selectedClient}
+            onChange={handleChangeClient}
+          />
+          <MyAutocomplete
+            label="Data Service"
+            options={dataServiceOptions}
+            value={selectedDataService}
+            onChange={handleChangeDataService}
+          />
         </Box>
 
         <Box sx={{ background: "white", padding: "1rem" }}>
-          <Box display="flex" justifyContent="space-between" marginBottom="10px">
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            marginBottom="10px"
+          >
             <Tabs value={tab} onChange={handleTabChange}>
               <Tab value="extract" label="Extract Center" disableRipple />
               <Tab value="workflow" label="Workflow" disableRipple />
             </Tabs>
 
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems:"center",
-              flexWrap: "wrap",
-              // my: 2,
-              gap: 2,
-            }}
-          >
-            <ExtractOverflowButtons tab={tab} />
-            {tab !== "extract" && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                // my: 2,
+                gap: 2,
+              }}
+            >
+              <ExtractOverflowButtons tab={tab} />
+              {tab !== "extract" && (
                 <MyAutocomplete
                   onChange={handleChangeClient}
                   options={extractCenterData?.timeZone || []}
                   label="Time Zone"
-              />
-            )}
+                />
+              )}
             </Box>
           </Box>
 
@@ -179,8 +194,22 @@ const ExtractCenterTable = () => {
             extractName={selectedExtractName}
             versions={selectedVersions}
           />
-          <Box display="flex" justifyContent="center" minHeight="300px">
+          {/* <Box display="flex" justifyContent="center" minHeight="300px">
             {loading ? <CircularProgress /> : <MaterialReactTable table={table} />}
+          </Box> */}
+          <Box
+            display="flex"
+            justifyContent="center"
+            minHeight="300px"
+            width="100%"
+          >
+            {loading ? (
+              <CircularProgress />
+            ) : tab === "extract" ? (
+              <MaterialReactTable table={table} />
+            ) : (
+              <WorkflowView />
+            )}
           </Box>
         </Box>
       </Box>
