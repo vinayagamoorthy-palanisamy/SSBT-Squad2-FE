@@ -1,22 +1,8 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  Container,
-  Typography,
-  Paper,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormGroup,
-  FormControlLabel,
-  Switch,
-  TextField,
-  Button,
-  Grid
+  Container, Typography, Paper, Accordion, AccordionSummary, AccordionDetails,
+  Box, FormControl, InputLabel, Select, MenuItem, FormGroup, FormControlLabel,
+  Switch, TextField, Button, Grid
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -32,50 +18,77 @@ import DatasetAddColumns from '../components/DatasetAddColumns';
 import DatasetAddFunctions from '../components/DatasetAddFunctions';
 import DatasetListView from '../components/DatasetListView';
 
+// Your initial columns:
+const datasetColumns = [
+  { name: 'Column_4', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_5', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_6', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_7', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_8', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_9', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_10', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_11', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_74', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_3', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_2', type: 'column', fixedLengthValue: 0 },
+  { name: 'Column_1', type: 'column', fixedLengthValue: 0 }
+];
+
+// Utility for unique key
+const getKey = (item) =>
+  item.type === 'function'
+    ? item.expression
+    : item.name;
+
 const DraggableChip = ({
   item,
   index,
-  moveChip,
-  selectedColumns,
-  setSelectedColumns,
-  allColumns,
+  allItems,
+  filteredIndices,
+  selectedKeys,
+  setSelectedKeys,
   lastClickedIndex,
   setLastClickedIndex,
+  moveGroup,
 }) => {
-  const column = item.name;
+  const key = getKey(item);
   const isFunction = item.type === 'function';
-  const isSelected = selectedColumns.has(column);
+  const isSelected = selectedKeys.has(key);
 
   const handleClick = (e) => {
-    const next = new Set(selectedColumns);
+    const next = new Set(selectedKeys);
     if (e.shiftKey && lastClickedIndex != null) {
+      // shift-select over the **visible filtered list** indices
       const [start, end] = [lastClickedIndex, index].sort((a, b) => a - b);
       for (let i = start; i <= end; i++) {
-        next.add(allColumns[i].name);
+        next.add(getKey(allItems[filteredIndices[i]]));
       }
-    } else if (e.ctrlKey || e.metaKey) {
-      next.has(column) ? next.delete(column) : next.add(column);
-      setLastClickedIndex(index);
     } else {
-      next.has(column) ? next.delete(column) : next.add(column);
+      next.has(key) ? next.delete(key) : next.add(key);
       setLastClickedIndex(index);
     }
-    setSelectedColumns(next);
+    setSelectedKeys(next);
   };
 
+  // Use realIndex to always reference in the FULL allItems list (not just filtered)
+  const realIndex = filteredIndices[index];
+
   const [{ isDragging }, drag] = useDrag({
-    type: 'COLUMN',
-    item: () => ({ index, list: selectedColumns.has(column) ? Array.from(selectedColumns) : [column] }),
+    type: 'ITEM',
+    item: {
+      dragIndex: realIndex, // real index in allItems
+      selectedKeys: isSelected ? Array.from(selectedKeys) : [key],
+    },
     collect: monitor => ({ isDragging: monitor.isDragging() }),
   });
 
   const [, drop] = useDrop({
-    accept: 'COLUMN',
-    hover: (item) => {
-      if (item.index === index) return;
-      moveChip(item.index, index, item.list);
-      item.index = index;
-    },
+    accept: 'ITEM',
+    hover: (dragItem) => {
+      if (dragItem.dragIndex === realIndex) return;
+      moveGroup(dragItem.dragIndex, realIndex, dragItem.selectedKeys);
+      dragItem.dragIndex = realIndex;
+    }
   });
 
   return (
@@ -83,25 +96,32 @@ const DraggableChip = ({
       <Box
         sx={{
           p: 1,
-          bgcolor: isSelected ? '#1976d2' : '#fff',
-          color: isSelected ? '#fff' : isFunction ? '#0F8048' : '#000',
+          bgcolor: isSelected
+            ? (isFunction ? '#0F8048' : '#1976d2')
+            : '#fff',
+          color: isSelected
+            ? '#fff'
+            : (isFunction ? '#0F8048' : '#000'),
           border: '1px solid',
-          borderColor: isSelected ? '#1976d2' : isFunction ? '#0F8048' : 'rgba(0,0,0,0.23)',
+          borderColor: isSelected
+            ? (isFunction ? '#0F8048' : '#1976d2')
+            : (isFunction ? '#0F8048' : 'rgba(0,0,0,0.23)'),
           borderRadius: 2,
           textAlign: 'center',
           cursor: 'grab',
           '&:hover': {
             bgcolor: isSelected
-              ? '#1565c0'
-              : isFunction
-              ? '#c8e6c9'
-              : '#f0f0f0',
+              ? (isFunction ? '#0a5830' : '#1565c0')
+              : (isFunction ? '#c8e6c9' : '#f0f0f0'),
           },
           width: 250,
-          fontWeight:'normal'
+          fontWeight: 'normal',
+          mb: 1,
         }}
       >
-        {column}
+        <Typography variant="body1" fontWeight={isFunction ? 700 : 400}>
+          {isFunction ? item.expression : item.name}
+        </Typography>
       </Box>
     </div>
   );
@@ -119,51 +139,46 @@ export default function DatasetDefinition() {
     { name: 'P_IN_CLIENT_ID', value: 'JANUS' }
   ]);
 
-  const [submittedColumns, setSubmittedColumns] = useState([]);
-  const [submittedFunctions, setSubmittedFunctions] = useState([]);
-  const [columns, setColumns] = useState([]);
-  const [selectedColumns, setSelectedColumns] = useState(new Set());
+  // <--- Single array for everything --->
+  const [allItems, setAllItems] = useState([]);
+
+  // For selection and drag
+  const [selectedKeys, setSelectedKeys] = useState(new Set());
   const [lastClickedIndex, setLastClickedIndex] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sqlMode, setSqlMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState('Dataset1');
 
-  useEffect(() => {
-  if (submittedColumns.length && typeof submittedColumns[0] === 'object') {
-    setColumns(submittedColumns); // Already contains { name, type } in order
-  } else {
-    // Fallback for first-time column addition
-    const fallback = [
-      ...submittedColumns.map(name => ({ name, type: 'column' })),
-      ...submittedFunctions.map(func =>
-        typeof func === 'string'
-          ? { name: func, type: 'function' }
-          : { name: func?.expression || func?.name || 'Unnamed', type: 'function' }
-      )
-    ];
-    setColumns(fallback);
-  }
-  setSelectedColumns(new Set());
-}, [submittedColumns, submittedFunctions]);
+  // get filtered items and their indices in allItems
+  const { filteredItems, filteredIndices } = useMemo(() => {
+    const items = [];
+    const indices = [];
+    allItems.forEach((item, i) => {
+      if (item.type === 'function'
+        ? item.expression?.toLowerCase().includes(searchQuery.toLowerCase())
+        : item.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
+        items.push(item);
+        indices.push(i);
+      }
+    });
+    return { filteredItems: items, filteredIndices: indices };
+  }, [allItems, searchQuery]);
 
-  const filteredColumns = useMemo(
-    () => columns.filter(c => c.name?.toLowerCase?.().includes(searchQuery.toLowerCase())),
-    [columns, searchQuery]
-  );
-
-  const moveChip = useCallback((from, to, draggedNames) => {
-    setColumns(prev => {
+  // Drag & drop moves all selected (regardless of type), keeping order
+  const moveGroup = useCallback((from, to, draggedKeys) => {
+    setAllItems(prev => {
       const arr = [...prev];
-      const moving = draggedNames.length
-        ? arr.filter(c => draggedNames.includes(c.name))
-        : [arr[from]];
-      const rest = arr.filter(c => !moving.includes(c));
+      const moving = arr.filter(c => draggedKeys.includes(getKey(c)));
+      const rest = arr.filter(c => !draggedKeys.includes(getKey(c)));
       rest.splice(to, 0, ...moving);
       return rest;
     });
+    // selection set is not cleared
   }, []);
 
+  // Open "Add Columns" modal
   const handleAddColumns = () => {
     handleOpenModal({
       isOpen: true,
@@ -172,9 +187,16 @@ export default function DatasetDefinition() {
         <DatasetAddColumns
           onClose={handleCloseModal}
           onApply={cols => {
-            setSubmittedColumns(cols); // cols is array of strings
+            // Only add new columns (no duplicate names)
+            setAllItems(current => {
+              const existingNames = new Set(current.filter(i => i.type === 'column').map(i => i.name));
+              // Add new columns, keeping existing functions at their place
+              const newCols = cols.filter(c => !existingNames.has(c.name));
+              return [...current.filter(i => i.type !== 'column'), ...newCols];
+            });
             handleCloseModal();
           }}
+          datasetColumns={datasetColumns}
         />
       ),
       title: 'Add Columns',
@@ -193,7 +215,12 @@ export default function DatasetDefinition() {
     });
   };
 
-  const columnsByType = { text: submittedColumns, number: [], date: [], boolean: [] };
+  const columnsByType = useMemo(() => ({
+    text: allItems.filter(i => i.type === 'column'),
+    number: [],
+    date: [],
+    boolean: []
+  }), [allItems]);
 
   const handleAddFunctions = () => {
     handleOpenModal({
@@ -204,7 +231,20 @@ export default function DatasetDefinition() {
           onClose={handleCloseModal}
           columnsByType={columnsByType}
           onApply={funcs => {
-            setSubmittedFunctions(funcs); // funcs is array of strings
+            setAllItems(current => {
+              // Only add new functions (no duplicate expressions)
+              const existingExpressions = new Set(current.filter(i => i.type === 'function').map(i => i.expression));
+              // Place new functions after the last column, or at the end
+              const lastColumnIdx = current.map(i => i.type).lastIndexOf('column');
+              const newFuncs = funcs.filter(f => !existingExpressions.has(f.expression));
+              let arr = [...current];
+              if (lastColumnIdx === -1) {
+                arr = [...arr, ...newFuncs];
+              } else {
+                arr.splice(lastColumnIdx + 1, 0, ...newFuncs);
+              }
+              return arr;
+            });
             handleCloseModal();
           }}
         />
@@ -238,9 +278,8 @@ export default function DatasetDefinition() {
         <Typography variant="h4" gutterBottom style={{ color: '#000000' }}>Define Dataset</Typography>
 
         <Paper sx={{ mb: 3, p: 3 }} elevation={3}>
-          <Accordion >
+          <Accordion>
             <AccordionSummary
-            
               expandIcon={<ExpandMoreIcon />}
               sx={{
                 flexDirection: 'row-reverse',
@@ -278,48 +317,51 @@ export default function DatasetDefinition() {
 
         <Paper elevation={3}>
           <Box sx={{ p: 2, px: 3, backgroundColor: '#F0F2F5' }} display="flex" justifyContent="space-between">
-            <Typography fontWeight={'bold'} variant="h6">Dataset Columns</Typography>
+            <Typography fontWeight={'bold'} variant="h6">Dataset Columns & Functions</Typography>
             <Box display="flex" gap={2}>
               <Button sx={{ color: '#0014BF', fontWeight: 'bold' }} onClick={handleAddColumns} startIcon={<AddCircleOutlineIcon />}>Add Columns</Button>
-              <Button disabled={!columns.length} onClick={handleAddFunctions} sx={{ color: '#0014BF', fontWeight: 'bold' }} startIcon={<AddCircleOutlineIcon />}>Add Functions</Button>
-              <Button disabled={!columns.length} onClick={() => setIsSidebarOpen(b => !b)} sx={{ color: '#0014BF', fontWeight: 'bold' }} startIcon={<ListAltIcon />}>List View</Button>
+              <Button disabled={!allItems.some(i => i.type === 'column')} onClick={handleAddFunctions} sx={{ color: '#0014BF', fontWeight: 'bold' }} startIcon={<AddCircleOutlineIcon />}>Add Functions</Button>
+              <Button disabled={!allItems.length} onClick={() => setIsSidebarOpen(b => !b)} sx={{ color: '#0014BF', fontWeight: 'bold' }} startIcon={<ListAltIcon />}>List View</Button>
             </Box>
           </Box>
 
           <Box sx={{ p: 3 }}>
-            {columns.length > 0 && (
-              <TextField fullWidth size="small" placeholder="Search column" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} sx={{ mb: 2 }} />
+            {allItems.length > 0 && (
+              <TextField fullWidth size="small" placeholder="Search columns or functions" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} sx={{ mb: 2 }} />
             )}
 
-            <Box minHeight={300} maxHeight={300} display="flex" alignItems={!filteredColumns.length ? 'center' : 'flex-start'} justifyContent={!filteredColumns.length ? 'center' : 'flex-start'}>
-              {filteredColumns.length ? (
+            <Box minHeight={300} maxHeight={300} display="flex" alignItems={!filteredItems.length ? 'center' : 'flex-start'} justifyContent={!filteredItems.length ? 'center' : 'flex-start'}>
+              {filteredItems.length ? (
                 <Grid container spacing={1}>
-                  {filteredColumns.map((item, i) => (
-                    <Grid item xs={6} sm={4} md={3} key={item.name + item.type}>
+                  {filteredItems.map((item, i) => (
+                    <Grid item xs={6} sm={4} md={3} key={getKey(item)}>
                       <DraggableChip
                         item={item}
                         index={i}
-                        moveChip={moveChip}
-                        selectedColumns={selectedColumns}
-                        setSelectedColumns={setSelectedColumns}
-                        allColumns={filteredColumns}
+                        allItems={allItems}
+                        filteredIndices={filteredIndices}
+                        selectedKeys={selectedKeys}
+                        setSelectedKeys={setSelectedKeys}
                         lastClickedIndex={lastClickedIndex}
                         setLastClickedIndex={setLastClickedIndex}
+                        moveGroup={moveGroup}
                       />
                     </Grid>
                   ))}
                 </Grid>
               ) : (
-                <Typography>There are no columns selected. Add columns to view them here.</Typography>
+                <Typography color="text.secondary" sx={{ py: 8, textAlign: 'center' }}>
+                  No columns or functions selected yet. Add columns to start!
+                </Typography>
               )}
             </Box>
 
-              <DatasetListView
-                columns={columns}
-                isSidebarOpen={isSidebarOpen}
-                toggleSidebar={() => setIsSidebarOpen(o => !o)}
-                setSubmittedColumns={setSubmittedColumns} 
-              />
+            <DatasetListView
+              items={allItems}
+              isSidebarOpen={isSidebarOpen}
+              toggleSidebar={() => setIsSidebarOpen(o => !o)}
+              setItems={setAllItems}
+            />
           </Box>
         </Paper>
 

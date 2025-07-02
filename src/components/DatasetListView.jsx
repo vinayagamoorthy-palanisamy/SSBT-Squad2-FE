@@ -10,6 +10,9 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const ItemType = { COLUMN: 'COLUMN' };
 
+const getKey = (item) =>
+  item.type === 'function' ? item.expression : item.name;
+
 const DraggableListItem = ({
   item, moveItems, handleDelete,
   isSelected, handleItemClick, selectedItems
@@ -20,9 +23,9 @@ const DraggableListItem = ({
     type: ItemType.COLUMN,
     item: {
       item,
-      items: selectedItems.includes(item.name)
+      items: isSelected
         ? selectedItems
-        : [item.name]
+        : [getKey(item)]
     },
     collect: monitor => ({
       isDragging: monitor.isDragging()
@@ -32,8 +35,8 @@ const DraggableListItem = ({
   const [, drop] = useDrop({
     accept: ItemType.COLUMN,
     hover(dragged) {
-      if (dragged.item.name === item.name) return;
-      moveItems(dragged.items, item.name);
+      if (getKey(dragged.item) === getKey(item)) return;
+      moveItems(dragged.items, getKey(item));
       dragged.item = item;
     }
   });
@@ -43,7 +46,7 @@ const DraggableListItem = ({
   return (
     <Paper
       ref={ref}
-      onClick={(e) => handleItemClick(e, item.name)}
+      onClick={(e) => handleItemClick(e, getKey(item))}
       variant="outlined"
       sx={{
         display: 'flex',
@@ -61,14 +64,14 @@ const DraggableListItem = ({
       <Stack direction="row" alignItems="center" spacing={1}>
         <DragIndicatorIcon fontSize="small" color="action" />
         <Typography sx={{ fontWeight: isSelected ? 'bold' : 'normal' }}>
-          {item.name}
+          {item.type === 'function' ? item.expression : item.name}
         </Typography>
       </Stack>
       <IconButton
         size="small"
         onClick={(e) => {
           e.stopPropagation();
-          handleDelete(item.name);
+          handleDelete(getKey(item));
         }}
       >
         <CloseIcon fontSize="small" />
@@ -78,64 +81,64 @@ const DraggableListItem = ({
 };
 
 const DatasetListView = ({
-  setSubmittedColumns,
+  setItems,
   isSidebarOpen,
   toggleSidebar,
-  columns
+  items
 }) => {
-  const [items, setItems] = useState([]);
-  const [selected, setSelected] = useState([]); // array of item.name
+  const [localItems, setLocalItems] = useState([]);
+  const [selected, setSelected] = useState([]); // array of key (expression or name)
   const lastClick = useRef(null);
 
   useEffect(() => {
-    setItems(columns);
+    setLocalItems(items);
     setSelected([]);
-  }, [columns]);
+  }, [items]);
 
-  const moveItems = useCallback((draggedItemNames, targetItemName) => {
-    setItems(prev => {
-      const moving = prev.filter(i => draggedItemNames.includes(i.name));
-      const rest = prev.filter(i => !draggedItemNames.includes(i.name));
-      const dropIndex = rest.findIndex(i => i.name === targetItemName);
+  const moveItems = useCallback((draggedKeys, targetKey) => {
+    setLocalItems(prev => {
+      const moving = prev.filter(i => draggedKeys.includes(getKey(i)));
+      const rest = prev.filter(i => !draggedKeys.includes(getKey(i)));
+      const dropIndex = rest.findIndex(i => getKey(i) === targetKey);
       rest.splice(dropIndex, 0, ...moving);
       return rest;
     });
-    setSelected(draggedItemNames);
+    setSelected(draggedKeys);
   }, []);
 
-  const handleDelete = (itemName) => {
-    setItems(prev => prev.filter(i => i.name !== itemName));
-    setSelected(prev => prev.filter(n => n !== itemName));
+  const handleDelete = (itemKey) => {
+    setLocalItems(prev => prev.filter(i => getKey(i) !== itemKey));
+    setSelected(prev => prev.filter(n => n !== itemKey));
   };
 
   const handleBulkDelete = () => {
     const toDelete = new Set(selected);
-    setItems(prev => prev.filter(i => !toDelete.has(i.name)));
+    setLocalItems(prev => prev.filter(i => !toDelete.has(getKey(i))));
     setSelected([]);
   };
 
-  const handleItemClick = (e, itemName) => {
-    const index = items.findIndex(i => i.name === itemName);
+  const handleItemClick = (e, itemKey) => {
+    const index = localItems.findIndex(i => getKey(i) === itemKey);
 
     if (e.shiftKey && lastClick.current != null) {
-      const lastIndex = items.findIndex(i => i.name === lastClick.current);
+      const lastIndex = localItems.findIndex(i => getKey(i) === lastClick.current);
       const [start, end] = [lastIndex, index].sort((a, b) => a - b);
-      const range = items.slice(start, end + 1).map(i => i.name);
+      const range = localItems.slice(start, end + 1).map(getKey);
       setSelected(prev => [...new Set([...prev, ...range])]);
     } else if (e.ctrlKey || e.metaKey) {
       setSelected(prev =>
-        prev.includes(itemName)
-          ? prev.filter(n => n !== itemName)
-          : [...prev, itemName]
+        prev.includes(itemKey)
+          ? prev.filter(n => n !== itemKey)
+          : [...prev, itemKey]
       );
-      lastClick.current = itemName;
+      lastClick.current = itemKey;
     } else {
       setSelected(prev =>
-        prev.includes(itemName)
-          ? prev.filter(n => n !== itemName)
-          : [...prev, itemName]
+        prev.includes(itemKey)
+          ? prev.filter(n => n !== itemKey)
+          : [...prev, itemKey]
       );
-      lastClick.current = itemName;
+      lastClick.current = itemKey;
     }
   };
 
@@ -143,19 +146,19 @@ const DatasetListView = ({
     <DndProvider backend={HTML5Backend}>
       <Drawer anchor="right" open={isSidebarOpen} onClose={toggleSidebar}>
         <Box sx={{ width: 300, p: 2 }}>
-          <Typography variant="h6">Dataset Columns</Typography>
+          <Typography variant="h6">Dataset Columns & Functions</Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom>
             Click to select/deselect. Shift for range. Cmd/Ctrl for multi-toggle.
           </Typography>
           <Divider sx={{ my: 2 }} />
           <List disablePadding>
-            {items.map((item) => (
+            {localItems.map((item) => (
               <DraggableListItem
-                key={item.name + item.type}
+                key={getKey(item)}
                 item={item}
                 moveItems={moveItems}
                 handleDelete={handleDelete}
-                isSelected={selected.includes(item.name)}
+                isSelected={selected.includes(getKey(item))}
                 handleItemClick={handleItemClick}
                 selectedItems={selected}
               />
@@ -176,17 +179,15 @@ const DatasetListView = ({
             <Button variant="outlined" onClick={toggleSidebar}>
               Cancel
             </Button>
-           <Button
+            <Button
               variant="contained"
               onClick={() => {
-                setSubmittedColumns(items); // this now stores full array of { name, type }
+                setItems(localItems); // this now stores full array (columns+functions+order)
                 toggleSidebar();
               }}
             >
               Save
             </Button>
-
-             
           </Box>
         </Box>
       </Drawer>
