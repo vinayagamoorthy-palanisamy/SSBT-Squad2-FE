@@ -79,6 +79,7 @@ const ExtractCenterTable = () => {
       });
 
       setClientOptions(["All", ...Array.from(clients)]);
+      console.log('extractCenterData',extractCenterData)
       setDataServiceOptions(["All", ...Array.from(dataServices)]);
     }
   }, [extractCenterData?.tableData]);
