@@ -146,9 +146,9 @@ const DatasetListView = ({
     <DndProvider backend={HTML5Backend}>
       <Drawer anchor="right" open={isSidebarOpen} onClose={toggleSidebar}>
         <Box sx={{ width: 300, padding: 2 }}>
-          <Typography variant="h6">Dataset Columns</Typography>
+          <Typography variant="h6" fontWeight={'bold'}>Dataset Columns</Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            Click to select/unselect. Use Shift + Click to select a range.
+            Drag the columns to place the columns in desired order for extract.
           </Typography>
 
           <Divider sx={{ my: 2 }} />
@@ -181,7 +181,7 @@ const DatasetListView = ({
           </Box>
 
           <Box mt={3} display="flex" justifyContent="flex-end" gap={1}>
-            <Button variant="outlined" onClick={toggleSidebar}>
+            <Button variant="outlined" onClick={toggleSidebar} sx={{color:'#0014BF', border:'1px solid #0014BF', fontWeight: '600', textTransform: 'none'}}>
               Cancel
             </Button>
             <Button
@@ -198,6 +198,7 @@ const DatasetListView = ({
                 '&:hover': {
                   backgroundColor: '#002bb8',
                 },
+                 fontWeight: '600', textTransform: 'none'
               }}
             >
               Save
