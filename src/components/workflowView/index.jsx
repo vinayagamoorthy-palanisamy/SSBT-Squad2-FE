@@ -13,7 +13,6 @@ const WorkflowView = () => {
       elevation={1}
       sx={{
         padding: 2,
-        borderRadius: 2,
         backgroundColor: "white",
         width: "100%",
       }}
@@ -22,7 +21,7 @@ const WorkflowView = () => {
         display="flex"
         alignItems="center"
         onClick={() => setOpenSummary(!openSummary)}
-        sx={{ cursor: "pointer", userSelect: "none", mb: 1 }}
+        sx={{ cursor: "pointer", userSelect: "none", mb: 2 }}
       >
         <IconButton size="small">
           {openSummary ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
@@ -31,8 +30,11 @@ const WorkflowView = () => {
       </Box>
 
       <Collapse in={openSummary}>
-        <WorkflowSummaryTable />
+        <Box mb={2}>
+          <WorkflowSummaryTable />
+        </Box>
       </Collapse>
+
       <WorkflowDataTable />
     </Paper>
   );
