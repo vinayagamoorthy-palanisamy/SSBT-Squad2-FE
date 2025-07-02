@@ -6,11 +6,16 @@ import {
   Typography,
   FormControl,
   InputLabel,
-} from '@mui/material';
-import { useState } from 'react';
+} from "@mui/material";
+import { useState } from "react";
 
-const HeaderControls = ({ timeZones = [], onRun, onUpdateMapping, onVersionHistory }) => {
-  const [selectedZone, setSelectedZone] = useState('');
+const HeaderControls = ({
+  timeZones = [],
+  onRun,
+  onUpdateMapping,
+  onVersionHistory,
+}) => {
+  const [selectedZone, setSelectedZone] = useState("");
 
   return (
     <Box
@@ -31,13 +36,15 @@ const HeaderControls = ({ timeZones = [], onRun, onUpdateMapping, onVersionHisto
         </Button>
 
         {/* Time Zone Select */}
-        <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel id="timezone-label">Time Zone</InputLabel>
+        <Box display="flex" alignItems="center" gap={1}>
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+            Time Zone:
+          </Typography>
           <Select
-            labelId="timezone-label"
+            size="small"
             value={selectedZone}
-            label="Time Zone"
             onChange={(e) => setSelectedZone(e.target.value)}
+            sx={{ minWidth: 140 }}
           >
             {timeZones.map((tz, index) => (
               <MenuItem key={index} value={tz}>
@@ -45,7 +52,7 @@ const HeaderControls = ({ timeZones = [], onRun, onUpdateMapping, onVersionHisto
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
+        </Box>
       </Box>
     </Box>
   );
