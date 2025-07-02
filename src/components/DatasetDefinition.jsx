@@ -2,7 +2,8 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Container, Typography, Paper, Accordion, AccordionSummary, AccordionDetails,
   Box, FormControl, InputLabel, Select, MenuItem, FormGroup, FormControlLabel,
-  Switch, TextField, Button, Grid
+  Switch, TextField, Button, Grid,
+  Divider
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -10,6 +11,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import EditSquareIcon from '@mui/icons-material/EditSquare';
 
 import useCustomModal from '../store/useCustomModal';
 import ParameterPreviewModal from '../components/ParameterPreviewModal';
@@ -17,6 +19,7 @@ import HoldingsPreviewModal from '../components/HoldingsPreviewModal';
 import DatasetAddColumns from '../components/DatasetAddColumns';
 import DatasetAddFunctions from '../components/DatasetAddFunctions';
 import DatasetListView from '../components/DatasetListView';
+import FixedLengthModal from './fixedLengthModal';
 
 // Your initial columns:
 const datasetColumns = [
@@ -33,6 +36,8 @@ const datasetColumns = [
   { name: 'Column_2', type: 'column', fixedLengthValue: 0 },
   { name: 'Column_1', type: 'column', fixedLengthValue: 0 }
 ];
+
+const isFixedLength = true
 
 // Utility for unique key
 const getKey = (item) =>
@@ -97,31 +102,38 @@ const DraggableChip = ({
         sx={{
           p: 1,
           bgcolor: isSelected
-            ? (isFunction ? '#0F8048' : '#1976d2')
+            ? '#DAECFE'
             : '#fff',
           color: isSelected
-            ? '#fff'
+            ? '#0014BF'
             : (isFunction ? '#0F8048' : '#000'),
           border: '1px solid',
           borderColor: isSelected
-            ? (isFunction ? '#0F8048' : '#1976d2')
-            : (isFunction ? '#0F8048' : 'rgba(0,0,0,0.23)'),
-          borderRadius: 2,
+            ?  '#0014BF'
+            :  (isFunction ? '#0F8048' :'rgba(0,0,0,0.23)'),
+          borderRadius: 5,
           textAlign: 'center',
           cursor: 'grab',
-          '&:hover': {
-            bgcolor: isSelected
-              ? (isFunction ? '#0a5830' : '#1565c0')
-              : (isFunction ? '#c8e6c9' : '#f0f0f0'),
-          },
+          minHeight: 20,
           width: 250,
           fontWeight: 'normal',
           mb: 1,
+          display: isFixedLength ? 'flex' : 'normal',
+          justifyContent: item?.type === 'function' || (item.type === 'column' && isFixedLength === false) ? 'center' : 'normal'
         }}
       >
-        <Typography variant="body1" fontWeight={isFunction ? 700 : 400}>
-          {isFunction ? item.expression : item.name}
+        {isFixedLength && item?.type === 'column' && 
+        <>
+        <Typography variant="body2" sx={{ px: 1 }}>
+          {item?.fixedLengthValue || 0}
         </Typography>
+        <Divider  orientation="vertical" flexItem sx={{ mx: 1, bgcolor: isSelected ? '#ffffff' : '#C4C8CC', alignSelf: "stretch" }} /> </>}
+        <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Typography variant="body1" fontWeight={ 500} sx={{ px: 1, textAlign: "center" }}>
+          {isFunction ? item.expression : item?.name}
+        </Typography>
+        </Box>
+        {/* </Box> */}
       </Box>
     </div>
   );
@@ -149,6 +161,7 @@ export default function DatasetDefinition() {
   const [sqlMode, setSqlMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState('Dataset1');
+  const [openFixedLength, setOpenFixedLength] = useState(false)
 
   // get filtered items and their indices in allItems
   const { filteredItems, filteredIndices } = useMemo(() => {
@@ -175,45 +188,45 @@ export default function DatasetDefinition() {
       rest.splice(to, 0, ...moving);
       return rest;
     });
-    // selection set is not cleared
   }, []);
 
   // Open "Add Columns" modal
-  const handleAddColumns = () => {
-    handleOpenModal({
-      isOpen: true,
-      showClose: true,
-      content: (
-        <DatasetAddColumns
-          onClose={handleCloseModal}
-          onApply={cols => {
-            // Only add new columns (no duplicate names)
-            setAllItems(current => {
-              const existingNames = new Set(current.filter(i => i.type === 'column').map(i => i.name));
-              // Add new columns, keeping existing functions at their place
-              const newCols = cols.filter(c => !existingNames.has(c.name));
-              return [...current.filter(i => i.type !== 'column'), ...newCols];
-            });
-            handleCloseModal();
-          }}
-          datasetColumns={datasetColumns}
-        />
-      ),
-      title: 'Add Columns',
-      fullWidth: true,
-      maxWidth: 'lg',
-      customStyle: {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%,-50%)',
-        width: 920,
-        bgcolor: 'background.paper',
-        boxShadow: 24,
-        p: 4
-      }
-    });
-  };
+ const handleAddColumns = () => {
+  handleOpenModal({
+    isOpen: true,
+    showClose: true,
+    content: (
+      <DatasetAddColumns
+      fixed
+        onClose={handleCloseModal}
+        onApply={cols => {
+          setAllItems(current => {
+            const existingNames = new Set(current.filter(i => i.type === 'column').map(i => i.name));
+            const newCols = cols.filter(c => !existingNames.has(c.name));
+            return [...current, ...newCols];
+          });
+          handleCloseModal();
+          setOpenFixedLength(true)
+        }}
+        datasetColumns={datasetColumns}
+      />
+    ),
+    title: 'Add Columns',
+    fullWidth: true,
+    maxWidth: 'lg',
+    customStyle: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%,-50%)',
+      width: 920,
+      bgcolor: 'background.paper',
+      boxShadow: 24,
+      p: 4
+    }
+  });
+};
+
 
   const columnsByType = useMemo(() => ({
     text: allItems.filter(i => i.type === 'column'),
@@ -272,6 +285,9 @@ export default function DatasetDefinition() {
     setDataPreviewOpen(true);
   };
 
+  const handleEditCharLimit = () => {
+  setOpenFixedLength(true);
+};
   return (
     <DndProvider backend={HTML5Backend}>
       <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -319,9 +335,13 @@ export default function DatasetDefinition() {
           <Box sx={{ p: 2, px: 3, backgroundColor: '#F0F2F5' }} display="flex" justifyContent="space-between">
             <Typography fontWeight={'bold'} variant="h6">Dataset Columns & Functions</Typography>
             <Box display="flex" gap={2}>
-              <Button sx={{ color: '#0014BF', fontWeight: 'bold' }} onClick={handleAddColumns} startIcon={<AddCircleOutlineIcon />}>Add Columns</Button>
-              <Button disabled={!allItems.some(i => i.type === 'column')} onClick={handleAddFunctions} sx={{ color: '#0014BF', fontWeight: 'bold' }} startIcon={<AddCircleOutlineIcon />}>Add Functions</Button>
-              <Button disabled={!allItems.length} onClick={() => setIsSidebarOpen(b => !b)} sx={{ color: '#0014BF', fontWeight: 'bold' }} startIcon={<ListAltIcon />}>List View</Button>
+              <Button sx={{ color: '#0014BF', fontWeight: 'bold', textTransform: 'none' }} onClick={handleAddColumns} startIcon={<AddCircleOutlineIcon />}>Add Columns</Button>
+              <Button disabled={!allItems.some(i => i.type === 'column')} onClick={handleAddFunctions} sx={{ color: '#0014BF', fontWeight: 'bold', textTransform: 'none' }} startIcon={<AddCircleOutlineIcon />}>Add Functions</Button>
+              {
+              isFixedLength && <><Button disabled={!allItems.length} sx={{ color: '#0014BF', fontWeight: 'bold', textTransform: 'none' }}  onClick={handleEditCharLimit} startIcon={<EditSquareIcon />}>Edit Character Limit</Button>
+              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} /></>
+              }
+              <Button disabled={!allItems.length} onClick={() => setIsSidebarOpen(b => !b)} sx={{ color: '#0014BF', fontWeight: 'bold', textTransform: 'none' }} startIcon={<ListAltIcon />}>List View</Button>
             </Box>
           </Box>
 
@@ -361,7 +381,31 @@ export default function DatasetDefinition() {
               isSidebarOpen={isSidebarOpen}
               toggleSidebar={() => setIsSidebarOpen(o => !o)}
               setItems={setAllItems}
+              isFixedLength={isFixedLength}
             />
+
+            {isFixedLength && 
+            <FixedLengthModal 
+            open={openFixedLength} 
+            onClose={()=> setOpenFixedLength(false)} 
+            datasetColumns={allItems.filter(col => col.type === 'column')} 
+            onSave={updatedColumns => {
+            // Merge updated values into allItems (parent state)
+            setAllItems(items =>
+              items.map(item =>
+                item.type === "column"
+                  ? {
+                      ...item,
+                      fixedLengthValue:
+                        updatedColumns.find(c => c.name === item.name)?.fixedLengthValue ?? item.fixedLengthValue,
+                    }
+                  : item
+              )
+            );
+            setOpenFixedLength(false);
+          }}
+            />
+            }
           </Box>
         </Paper>
 

@@ -15,7 +15,7 @@ const getKey = (item) =>
 
 const DraggableListItem = ({
   item, moveItems, handleDelete,
-  isSelected, handleItemClick, selectedItems
+  isSelected, handleItemClick, selectedItems, isFixedLength
 }) => {
   const ref = useRef(null);
 
@@ -62,11 +62,20 @@ const DraggableListItem = ({
       }}
     >
       <Stack direction="row" alignItems="center" spacing={1}>
-        <DragIndicatorIcon fontSize="small" color="action" />
+        {isFixedLength && item?.type === 'column' && 
+          <>
+          <Typography variant="body2" sx={{ px: 1 }}>
+            {item?.fixedLengthValue || 0}
+          </Typography>
+          <Divider orientation="vertical" flexItem sx={{ mx: 1, bgcolor: isSelected ? '#ffffff' : '#C4C8CC' }} /> </>}
+        
         <Typography sx={{ fontWeight: isSelected ? 'bold' : 'normal' }}>
           {item.type === 'function' ? item.expression : item.name}
         </Typography>
+        
       </Stack>
+      <Box sx={{display: 'flex', alignItems :'center'}}>
+      <DragIndicatorIcon fontSize="small" color="action" />
       <IconButton
         size="small"
         onClick={(e) => {
@@ -76,6 +85,7 @@ const DraggableListItem = ({
       >
         <CloseIcon fontSize="small" />
       </IconButton>
+      </Box>
     </Paper>
   );
 };
@@ -84,7 +94,8 @@ const DatasetListView = ({
   setItems,
   isSidebarOpen,
   toggleSidebar,
-  items
+  items,
+  isFixedLength
 }) => {
   const [localItems, setLocalItems] = useState([]);
   const [selected, setSelected] = useState([]); // array of key (expression or name)
@@ -161,6 +172,7 @@ const DatasetListView = ({
                 isSelected={selected.includes(getKey(item))}
                 handleItemClick={handleItemClick}
                 selectedItems={selected}
+                isFixedLength={isFixedLength}
               />
             ))}
           </List>

@@ -112,14 +112,14 @@ export const DatasetAddColumns = ({ onClose, onApply, datasetColumns }) => {
   const handleSelectAllChange = (e) => {
     const updated = new Set(selectedColumns);
     filteredColumns.forEach(col =>
-      e.target.checked ? updated.add(col.name) : updated.delete(col.name)
+      e.target.checked ? updated.add(col?.name) : updated.delete(col?.name)
     );
     setSelectedColumns(updated);
   };
 
   const handleAddColumns = () => {
     // Only return column objects that are selected
-    onApply(columns.filter(col => selectedColumns.has(col.name)));
+    onApply(columns.filter(col => selectedColumns.has(col?.name)));
     onClose();
   };
 
