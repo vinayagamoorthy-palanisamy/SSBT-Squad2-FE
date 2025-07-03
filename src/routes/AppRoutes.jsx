@@ -13,9 +13,11 @@ import CreateWorkflow from '../components/CreateWorkflow';
 import CreateExtractPage from '../components/CreateExtractPage';
 import CreateExtractCard from '../components/CreateExtractCard';
 import DatasetDefinition from '../components/DatasetDefinition';
-import ExtractView from '../components/sla_tracker/extract_view/extract_view';
 import SLAView from '../components/sla_tracker/sla_view';
 //DefineCoreExtract
+import Sm_view from '../components/SlaLayout/Sm_view';
+import RunStateMonitor from '../components/SlaLayout/RunStateMonitor';
+import WorkflowView from '../components/workflowView';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -32,6 +34,9 @@ const AppRoutes = () => {
       <Route path="/DatasetDefinition" element={<DatasetDefinition />} />
       <Route path="/sla-extract-view" element={<SLAView />} />
       {/* <Route path="/modal" element={<MyModal/>} /> */}
+<Route path="/sm_view" element={<Sm_view/>}/>
+      <Route path="/run_state_monitor" element={<RunStateMonitor/>}/>
+      <Route path="/workflow-view" element={<WorkflowView />} />
     </Routes>
   );
 };
