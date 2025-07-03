@@ -1,0 +1,534 @@
+{
+  "extractViewData": {
+    "tableData": [
+      {
+        "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+        "Effective Date": "22-05-2025",
+        "Generation Status": "Completed",
+        "Delivery Status": "Retry",
+        "Client": "NACC2",
+        "Region": "EMEA",
+        "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT",
+        "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      },
+      {
+        "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+        "Effective Date": "22-05-2025",
+        "Generation Status": "Completed",
+        "Delivery Status": "Completed",
+        "Client": "HSBC Holdings PLC",
+        "Region": "NA",
+        "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT",
+          "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      },
+      {
+        "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+        "Effective Date": "22-05-2025",
+        "Generation Status": "Failed",
+        "Delivery Status": "Failed",
+        "Client": "NACC2",
+        "Region": "NA",
+        "Event Id": "SSDS_BO_FOR_NACC2_DER",
+          "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      },
+      {
+        "Extract Name": "SSDS_BO_FOR_NACC2_345",
+        "Effective Date": "22-05-2025",
+        "Generation Status": "In Progress",
+        "Delivery Status": "Not Start",
+        "Client": "NACC2",
+        "Region": "NA",
+        "Event Id": "SSDS_BO_FOR_NACC2_345",
+          "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      },
+      {
+        "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+        "Effective Date": "23-05-2025",
+        "Generation Status": "Pending",
+        "Delivery Status": "Retry",
+        "Client": "HSBC Holdings PLC",
+        "Region": "NA",
+        "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT",
+          "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      },
+      {
+        "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+        "Effective Date": "23-05-2025",
+        "Generation Status": "Completed",
+        "Delivery Status": "In Progress",
+        "Client": "NACC2",
+        "Region": "NA",
+        "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT",
+          "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      },
+      {
+        "Extract Name": "SSDS_BO_FOR_NACCNTWE",
+        "Effective Date": "23-05-2025",
+        "Generation Status": "Failed",
+        "Delivery Status": "Failed",
+        "Client": "HSBC Holdings PLC",
+        "Region": "NA",
+        "Event Id": "SSDS_BO_FOR_NACCNTWE",
+          "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      },
+      {
+        "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+        "Effective Date": "24-05-2025",
+        "Generation Status": "In Progress",
+        "Delivery Status": "Not Start",
+        "Client": "HSBC Holdings PLC",
+        "Region": "EMEA",
+        "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT",
+          "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      },
+      {
+        "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+        "Effective Date": "24-05-2025",
+        "Generation Status": "Pending",
+        "Delivery Status": "Retry",
+        "Client": "HSBC Holdings PLC",
+        "Region": "NA",
+        "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT",
+          "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      },
+      {
+        "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+        "Effective Date": "24-05-2025",
+        "Generation Status": "Completed",
+        "Delivery Status": "Completed",
+        "Client": "NACC2",
+        "Region": "NA",
+        "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT",
+          "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      },
+      {
+        "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+        "Effective Date": "25-05-2025",
+        "Generation Status": "In Progress",
+        "Delivery Status": "In Progress",
+        "Client": "NACC2",
+        "Region": "NA",
+        "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT",
+          "subRows": [
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Retry",
+            "Client": "NACC2",
+            "Region": "EMEA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_EXTRACT",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Completed",
+            "Delivery Status": "Completed",
+            "Client": "HSBC Holdings PLC",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_EXTRACT"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_DER",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "Failed",
+            "Delivery Status": "Failed",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_DER"
+          },
+          {
+            "Extract Name": "SSDS_BO_FOR_NACC2_345",
+            "Effective Date": "22-05-2025",
+            "Generation Status": "In Progress",
+            "Delivery Status": "Not Start",
+            "Client": "NACC2",
+            "Region": "NA",
+            "Event Id": "SSDS_BO_FOR_NACC2_345"
+          }
+         
+        ]
+      }
+    ]
+  }
+}
