@@ -30,7 +30,7 @@ const AppRoutes = () => {
       {/* <Route path="/filter"element ={<FilterBuilderFlow/>}/> */}
       <Route path='/create-extract' element={<CreateExtractPage />} />
       <Route path="/DatasetDefinition" element={<DatasetDefinition />} />
-        <Route path="/sla-view" element={<SLAView />} />
+      <Route path="/sla-extract-view" element={<SLAView />} />
       {/* <Route path="/modal" element={<MyModal/>} /> */}
     </Routes>
   );
