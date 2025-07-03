@@ -13,11 +13,14 @@ import CreateWorkflow from '../components/CreateWorkflow';
 import CreateExtractPage from '../components/CreateExtractPage';
 import CreateExtractCard from '../components/CreateExtractCard';
 import DatasetDefinition from '../components/DatasetDefinition';
+import ExtractView from '../components/sla_tracker/extract_view/extract_view';
+import SLAView from '../components/sla_tracker/sla_view';
 //DefineCoreExtract
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/extract-center" replace />} />
+      <Route path="/extract-center" element={<ExtractCenterTable />} />
       <Route path="/extract-center" element={<ExtractCenterTable />} />
       <Route path="/create-extract-card" element={<CreateExtractCard />} />
       <Route path="/transfer-list" element={<EditableTransferList />} />
@@ -25,8 +28,9 @@ const AppRoutes = () => {
       <Route path="/submit-custom-extract" element={<SubmitCustomExtract />} />
       <Route path="/create-workflow" element={<CreateWorkflow />} />
       {/* <Route path="/filter"element ={<FilterBuilderFlow/>}/> */}
-        <Route path='/create-extract' element={<CreateExtractPage/>} />
-        <Route path="/DatasetDefinition" element={<DatasetDefinition />} />
+      <Route path='/create-extract' element={<CreateExtractPage />} />
+      <Route path="/DatasetDefinition" element={<DatasetDefinition />} />
+        <Route path="/sla-view" element={<SLAView />} />
       {/* <Route path="/modal" element={<MyModal/>} /> */}
     </Routes>
   );
