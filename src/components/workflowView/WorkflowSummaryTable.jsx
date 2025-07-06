@@ -11,17 +11,27 @@ import { workflowSummary } from "../../data/workflowData";
 
 const WorkflowSummaryTable = () => {
   return (
-    <TableContainer component={Paper} sx={{ mb: 2 }}>
+    <TableContainer
+  component={Paper}
+  sx={{
+    mb: 2,
+    maxHeight: '300px',
+    overflowY: 'auto',
+    borderRadius: 0,
+    backgroundColor: '#fff',
+  }}
+>
+
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Client Name</TableCell>
-            <TableCell>SM Pending</TableCell>
-            <TableCell>SM Failed</TableCell>
-            <TableCell>SM Met</TableCell>
-            <TableCell>SM Missed</TableCell>
-            <TableCell>SM At Risk</TableCell>
-            <TableCell>Overall Failed</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>Client Name</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>SM Pending</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>SM Failed</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>SM Met</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>SM Missed</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>SM At Risk</TableCell>
+            <TableCell sx={{ fontWeight: 'bold' }}>Overall Failed</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -33,7 +43,13 @@ const WorkflowSummaryTable = () => {
               <TableCell>{row.met}</TableCell>
               <TableCell>{row.missed}</TableCell>
               <TableCell>{row.risk}</TableCell>
-              <TableCell>{row.failedOverall}</TableCell>
+              <TableCell
+                sx={{
+                  color: row.failedOverall > 0 ? "#f44336" : "inherit",
+                }}
+              >
+                {row.failedOverall}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
