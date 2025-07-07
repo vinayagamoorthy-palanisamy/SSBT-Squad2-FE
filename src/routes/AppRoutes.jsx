@@ -13,14 +13,16 @@ import CreateWorkflow from '../components/CreateWorkflow';
 import CreateExtractPage from '../components/CreateExtractPage';
 import CreateExtractCard from '../components/CreateExtractCard';
 import DatasetDefinition from '../components/DatasetDefinition';
+import SLAView from '../components/sla_tracker/sla_view';
+//DefineCoreExtract
 import Sm_view from '../components/SlaLayout/Sm_view';
 import RunStateMonitor from '../components/SlaLayout/RunStateMonitor';
-import SMViewLayout from '../components/SMViewLayout';
-//DefineCoreExtract
+import WorkflowView from '../components/workflowView';
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/extract-center" replace />} />
+      <Route path="/extract-center" element={<ExtractCenterTable />} />
       <Route path="/extract-center" element={<ExtractCenterTable />} />
       <Route path="/create-extract-card" element={<CreateExtractCard />} />
       <Route path="/transfer-list" element={<EditableTransferList />} />
@@ -28,12 +30,14 @@ const AppRoutes = () => {
       <Route path="/submit-custom-extract" element={<SubmitCustomExtract />} />
       <Route path="/create-workflow" element={<CreateWorkflow />} />
       {/* <Route path="/filter"element ={<FilterBuilderFlow/>}/> */}
-        <Route path='/create-extract' element={<CreateExtractPage/>} />
-        <Route path="/DatasetDefinition" element={<DatasetDefinition />} />
+      <Route path='/create-extract' element={<CreateExtractPage />} />
+      <Route path="/DatasetDefinition" element={<DatasetDefinition />} />
+      <Route path="/sla-extract-view" element={<SLAView />} />
       {/* <Route path="/modal" element={<MyModal/>} /> */}
       <Route path="/sm_view" element={<Sm_view/>}/>
       <Route path="/run_state_monitor" element={<RunStateMonitor/>}/>
       {/* <Route path="/sm_layout" element={<SMViewLayout/>}/> */}
+      <Route path="/workflow-view" element={<WorkflowView />} />
     </Routes>
   );
 };

@@ -22,7 +22,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 
-const RunStateMonitor = ({ children }) => {
+const RunStateMonitor = ({ children, onSubmitMonitor }) => {
   const [open, setOpen] = useState(false);
 
   const { control, handleSubmit, register, reset } = useForm({
@@ -41,7 +41,9 @@ const RunStateMonitor = ({ children }) => {
   });
 
   const onSubmit = (data) => {
-    console.log('Submitted Data:', data);
+    if (onSubmitMonitor) {
+      onSubmitMonitor(data);
+    }
     setOpen(false);
     reset();
   };
@@ -51,7 +53,7 @@ const RunStateMonitor = ({ children }) => {
       {children({ openDialog: () => setOpen(true) })}
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle sx={{ px: 4, pt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between' }}>
           Run State Monitor
           <IconButton onClick={() => setOpen(false)}>
             <CloseIcon />
@@ -59,7 +61,7 @@ const RunStateMonitor = ({ children }) => {
         </DialogTitle>
 
         <DialogContent dividers>
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Box component="form" noValidate>
             <Box display="flex" gap={2} mb={2}>
               <FormControl fullWidth required>
                 <InputLabel>State Monitor Name</InputLabel>
@@ -68,7 +70,7 @@ const RunStateMonitor = ({ children }) => {
                   control={control}
                   render={({ field }) => (
                     <Select {...field} label="State Monitor Name">
-                      <MenuItem value="Monitor 1">Monitor 3</MenuItem>
+                      <MenuItem value="Monitor 1">Monitor 1</MenuItem>
                       <MenuItem value="Monitor 2">Monitor 2</MenuItem>
                     </Select>
                   )}
@@ -112,7 +114,6 @@ const RunStateMonitor = ({ children }) => {
               fullWidth
               {...register('comment')}
               placeholder="Enter text here..."
-              variant="outlined"
               sx={{ mb: 2 }}
             />
 
@@ -123,8 +124,8 @@ const RunStateMonitor = ({ children }) => {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell><strong>Name</strong></TableCell>
-                  <TableCell><strong>Value</strong></TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Value</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -148,12 +149,8 @@ const RunStateMonitor = ({ children }) => {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={() => setOpen(false)} variant="outlined">
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit(onSubmit)} variant="contained">
-            Submit
-          </Button>
+          <Button onClick={() => setOpen(false)} variant="outlined">Cancel</Button>
+          <Button onClick={handleSubmit(onSubmit)} variant="contained">Submit</Button>
         </DialogActions>
       </Dialog>
     </>
@@ -161,4 +158,6 @@ const RunStateMonitor = ({ children }) => {
 };
 
 export default RunStateMonitor;
+
+
 
