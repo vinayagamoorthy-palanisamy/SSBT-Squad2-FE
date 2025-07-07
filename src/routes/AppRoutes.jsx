@@ -15,6 +15,7 @@ import CreateExtractCard from '../components/CreateExtractCard';
 import DatasetDefinition from '../components/DatasetDefinition';
 import Sm_view from '../components/SlaLayout/Sm_view';
 import RunStateMonitor from '../components/SlaLayout/RunStateMonitor';
+import SMViewLayout from '../components/SMViewLayout';
 //DefineCoreExtract
 const AppRoutes = () => {
   return (
@@ -32,6 +33,7 @@ const AppRoutes = () => {
       {/* <Route path="/modal" element={<MyModal/>} /> */}
       <Route path="/sm_view" element={<Sm_view/>}/>
       <Route path="/run_state_monitor" element={<RunStateMonitor/>}/>
+      {/* <Route path="/sm_layout" element={<SMViewLayout/>}/> */}
     </Routes>
   );
 };
