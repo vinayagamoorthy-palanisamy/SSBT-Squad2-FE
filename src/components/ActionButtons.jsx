@@ -15,13 +15,13 @@ export default function ActionButtons({
       <Box>
         <Button onClick={onCancel}>Cancel</Button>
         {currentStep > 0 && (
-          <Button onClick={onBack}>Back</Button>
+          <Button onClick={onBack} data-testid='back-button'>Back</Button>
         )}
       </Box>
       <Box>
         <Button onClick={onSave} sx={{ mr: 1 }}>Save</Button>
         {currentStep < lastStep ? (
-          <Button variant="contained" onClick={onNext}>
+          <Button variant="contained" onClick={onNext} data-testid='next-button'>
             Next
           </Button>
         ) : (
